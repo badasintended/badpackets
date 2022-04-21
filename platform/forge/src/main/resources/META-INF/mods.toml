@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[38,)"
+
+license = "Apache-2.0"
+issueTrackerURL = "https://github.com/badasintended/badpackets/issues"
+showAsResourcePack = false
+
+[[mods]]
+modId = "badpackets"
+version = "${version}"
+displayName = "Bad Packets API"
+description = "Allow packet messaging between multiple modding platform."
+authors = "deirn"
+logoFile = "badpackets.png"

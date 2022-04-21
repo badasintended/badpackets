@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id"           : "badpackets_testmod",
+  "version"      : "1",
+
+  "entrypoints"  : {
+    "main"  : ["lol.bai.badpackets.test.fabric.FabricBadPacketTest"],
+    "client": ["lol.bai.badpackets.test.fabric.FabricBadPacketTestClient"]
+  }
+}

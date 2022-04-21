@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id"           : "badpackets",
+  "version"      : "${version}",
+
+  "name"         : "Bad Packets",
+  "description"  : "Allow packet messaging between multiple modding platform.",
+  "icon"         : "badpackets.png",
+  "authors"      : ["deirn"],
+  "license"      : "Apache-2.0",
+  "mixins"       : ["badpackets.mixins.json"]
+}

@@ -1,0 +1,17 @@
+{
+  "required"          : true,
+  "minVersion"        : "0.8",
+  "package"           : "lol.bai.badpackets.impl.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "refmap"            : "badpackets.refmap.json",
+  "mixins"            : [
+    "MixinPlayerList",
+    "MixinServerGamePacketListenerImpl"
+  ],
+  "client"            : [
+    "client.MixinClientPacketListener"
+  ],
+  "injectors"         : {
+    "defaultRequire": 1
+  }
+}
