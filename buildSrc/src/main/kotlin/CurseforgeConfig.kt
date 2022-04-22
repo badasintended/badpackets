@@ -18,13 +18,13 @@ fun <T : Jar> UploadConfig.curseforge(task: T) = project.run {
                 releaseType = prop["cf.releaseType"]
 
                 changelogType = "markdown"
-                changelog = "https://github.com/badasintended/wthit/releases/tag/${project.version}"
+                changelog = "https://github.com/badasintended/badpackets/releases/tag/${project.version}"
 
                 addGameVersion(project.name.capitalize())
                 prop["cf.gameVersion"].split(", ").forEach(this::addGameVersion)
 
                 mainArtifact(task, closureOf<CurseArtifact> {
-                    displayName = "[${rootProp["minecraft"]}] ${project.version}"
+                    displayName = "[${project.name.capitalize()} ${rootProp["minecraft"]}] ${project.version}"
                 })
 
                 if(listOf("cf.require", "cf.optional", "cf.break").any { prop.has(it) }) relations(closureOf<CurseRelation> {

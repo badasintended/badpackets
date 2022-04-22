@@ -1,26 +1,24 @@
-import com.modrinth.minotaur.TaskModrinthUpload
+import com.modrinth.minotaur.ModrinthExtension
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.task
+import org.gradle.kotlin.dsl.configure
 
 fun <T : Jar> UploadConfig.modrinth(task: T) = project.run {
     apply(plugin = "com.modrinth.minotaur")
 
-    task<TaskModrinthUpload>("modrinth") {
-        group = "upload"
-        dependsOn("build")
+    env["MODRINTH_TOKEN"]?.let { MODRINTH_TOKEN ->
+        configure<ModrinthExtension> {
+            token.set(MODRINTH_TOKEN)
+            projectId.set(rootProp["mr.projectId"])
 
-        token = env["MODRINTH_TOKEN"]
-        projectId = rootProp["mr.projectId"]
-        releaseType = prop["mr.releaseType"]
+            versionNumber.set("${project.name}-${project.version}")
+            versionType.set(prop["mr.releaseType"])
+            changelog.set("https://github.com/badasintended/badpackets/releases/tag/${project.version}")
 
-        versionNumber = "${project.name}-${project.version}"
-        addLoader(project.name)
+            uploadFile.set(task)
 
-        uploadFile = task
-
-        prop["mr.gameVersion"].split(", ").forEach {
-            addGameVersion(it)
+            loaders.add(project.name)
+            gameVersions.addAll(prop["mr.gameVersion"].split(", "))
         }
     }
 }
