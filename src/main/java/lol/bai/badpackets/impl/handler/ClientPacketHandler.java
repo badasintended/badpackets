@@ -11,11 +11,13 @@ import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 
 public class ClientPacketHandler extends AbstractPacketHandler<S2CPacketReceiver> {
 
+    private final Minecraft client;
     private final ClientPacketListener listener;
 
-    public ClientPacketHandler(ClientPacketListener listener) {
+    public ClientPacketHandler(Minecraft client, ClientPacketListener listener) {
         super("ClientPlayPacketHandler", ChannelRegistry.S2C, ServerboundCustomPayloadPacket::new, listener.getConnection());
 
+        this.client = client;
         this.listener = listener;
     }
 
@@ -37,7 +39,7 @@ public class ClientPacketHandler extends AbstractPacketHandler<S2CPacketReceiver
 
     @Override
     protected void receive(S2CPacketReceiver receiver, FriendlyByteBuf buf) {
-        receiver.receive(Minecraft.getInstance(), listener, buf, this);
+        receiver.receive(client, listener, buf, this);
     }
 
     public interface Holder {
