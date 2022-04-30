@@ -1,5 +1,6 @@
 package lol.bai.badpackets.impl.handler;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,8 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
     public void sendInitialChannelSyncPacket() {
         if (!initialized) {
             initialized = true;
+            sendVanillaChannelRegisterPacket(Set.of(Constants.CHANNEL_SYNC));
+
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeByte(Constants.CHANNEL_SYNC_INITIAL);
 
@@ -103,18 +106,36 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
             }
 
             send(Constants.CHANNEL_SYNC, buf);
+            sendVanillaChannelRegisterPacket(registry.channels.keySet());
         }
     }
 
-    public void onRegister(ResourceLocation id, T handler) {
+    public void onRegister(ResourceLocation id) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeByte(Constants.CHANNEL_SYNC_SINGLE);
         buf.writeResourceLocation(id);
         send(Constants.CHANNEL_SYNC, buf);
+        sendVanillaChannelRegisterPacket(Set.of(id));
     }
 
     public void onDisconnect() {
         registry.removeHandler(this);
+    }
+
+    private void sendVanillaChannelRegisterPacket(Set<ResourceLocation> channels) {
+        if (!channels.isEmpty()) {
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+            boolean first = true;
+            for (ResourceLocation channel : channels) {
+                if (first) {
+                    first = false;
+                } else {
+                    buf.writeByte(0);
+                }
+                buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII));
+            }
+            send(Constants.MC_REGISTER_CHANNEL, buf);
+        }
     }
 
     @Override

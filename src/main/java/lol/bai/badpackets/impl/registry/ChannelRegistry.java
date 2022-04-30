@@ -13,8 +13,13 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ChannelRegistry<T> {
 
-    public static final ChannelRegistry<S2CPacketReceiver> S2C = new ChannelRegistry<>(Set.of(Constants.CHANNEL_SYNC));
-    public static final ChannelRegistry<C2SPacketReceiver> C2S = new ChannelRegistry<>(Set.of(Constants.CHANNEL_SYNC));
+    private static final Set<ResourceLocation> RESERVED_CHANNELS = Set.of(
+        Constants.CHANNEL_SYNC,
+        Constants.MC_REGISTER_CHANNEL,
+        Constants.MC_UNREGISTER_CHANNEL);
+
+    public static final ChannelRegistry<S2CPacketReceiver> S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<C2SPacketReceiver> C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
     public final Map<ResourceLocation, T> channels = new HashMap<>();
 
@@ -32,7 +37,7 @@ public class ChannelRegistry<T> {
 
         channels.put(id, receiver);
         for (AbstractPacketHandler<T> handler : handlers) {
-            handler.onRegister(id, receiver);
+            handler.onRegister(id);
         }
     }
 
