@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_16",
   "refmap"            : "badpackets.refmap.json",
   "mixins"            : [
+    "MixinConnection",
     "MixinPlayerList",
     "MixinServerGamePacketListenerImpl"
   ],

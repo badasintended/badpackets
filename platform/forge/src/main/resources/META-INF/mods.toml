@@ -8,7 +8,14 @@ showAsResourcePack = false
 [[mods]]
 modId = "badpackets"
 version = "${version}"
-displayName = "Bad Packets API"
+displayName = "Bad Packets"
 description = "Allow packet messaging between multiple modding platform."
 authors = "deirn"
 logoFile = "badpackets.png"
+
+[[dependencies.badpackets]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.1,)"
+ordering = "NONE"
+side = "BOTH"

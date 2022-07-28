@@ -8,5 +8,8 @@
   "icon"         : "badpackets.png",
   "authors"      : ["deirn"],
   "license"      : "Apache-2.0",
-  "mixins"       : ["badpackets.mixins.json"]
+  "mixins"       : ["badpackets.mixins.json"],
+  "depends": {
+    "minecraft" : ">=1.19.1"
+  }
 }

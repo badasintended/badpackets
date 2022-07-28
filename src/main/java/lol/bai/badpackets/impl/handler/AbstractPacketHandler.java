@@ -16,6 +16,7 @@ import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -139,13 +140,28 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
     }
 
     @Override
-    public void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+    public void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable PacketSendListener callback) {
         connection.send(packetFactory.apply(id, buf), callback);
+    }
+
+    @Override
+    public void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+        send(id, buf, callback == null ? null : new Listener(callback));
     }
 
     @Override
     public boolean canSend(ResourceLocation id) {
         return sendableChannels.contains(id);
+    }
+
+    public static class Listener implements PacketSendListener {
+
+        public final GenericFutureListener<? extends Future<? super Void>> delegate;
+
+        public Listener(GenericFutureListener<? extends Future<? super Void>> delegate) {
+            this.delegate = delegate;
+        }
+
     }
 
 }

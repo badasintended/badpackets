@@ -7,6 +7,7 @@ import lol.bai.badpackets.impl.handler.ClientPacketHandler;
 import lol.bai.badpackets.impl.handler.ServerPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
@@ -50,7 +51,7 @@ public interface PacketSender {
      * Send a packet to the target.
      */
     default void send(ResourceLocation id, FriendlyByteBuf buf) {
-        send(id, buf, null);
+        send(id, buf, (PacketSendListener) null);
     }
 
     /**
@@ -58,6 +59,14 @@ public interface PacketSender {
      *
      * @param callback a callback in which will be called after the packet sent to the target.
      */
+    void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable PacketSendListener callback);
+
+    /**
+     * Send a packet to the target.
+     *
+     * @param callback a callback in which will be called after the packet sent to the target.
+     */
+    @Deprecated
     void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable GenericFutureListener<? extends Future<? super Void>> callback);
 
 }

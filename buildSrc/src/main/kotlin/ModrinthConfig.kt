@@ -17,7 +17,7 @@ fun <T : Jar> UploadConfig.modrinth(task: T) = project.run {
 
             uploadFile.set(task)
 
-            loaders.add(project.name)
+            loaders.addAll(prop["mr.loader"].split(", "))
             gameVersions.addAll(prop["mr.gameVersion"].split(", "))
         }
     }
