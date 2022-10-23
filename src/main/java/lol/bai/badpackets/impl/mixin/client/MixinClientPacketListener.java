@@ -6,8 +6,10 @@ import net.minecraft.client.ClientTelemetryManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.LocalChatSession;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import org.spongepowered.asm.mixin.Final;
@@ -29,7 +31,7 @@ public class MixinClientPacketListener implements ClientPacketHandler.Holder {
     private ClientPacketHandler badpacket_packetHandler;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void badpackets_createClientPacketHandler(Minecraft minecraft, Screen screen, Connection connection, GameProfile gameProfile, ClientTelemetryManager clientTelemetryManager, CallbackInfo ci) {
+    private void badpackets_createClientPacketHandler(Minecraft $$0, Screen $$1, Connection $$2, LocalChatSession $$3, ServerData $$4, GameProfile $$5, ClientTelemetryManager $$6, CallbackInfo ci) {
         badpacket_packetHandler = new ClientPacketHandler(minecraft, (ClientPacketListener) (Object) this);
     }
 
