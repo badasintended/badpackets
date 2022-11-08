@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
@@ -45,8 +46,15 @@ public class MixinClientPacketListener implements ClientPacketHandler.Holder {
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void badpackets_receiveS2CPacket(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
-        if (!minecraft.isSameThread() && badpacket_packetHandler.receive(packet.getIdentifier(), packet.getData())) {
-            ci.cancel();
+        if (!minecraft.isSameThread()) {
+            FriendlyByteBuf buf = packet.getData();
+            try {
+                if (badpacket_packetHandler.receive(packet.getIdentifier(), buf)) {
+                    ci.cancel();
+                }
+            } finally {
+                buf.release();
+            }
         }
     }
 
