@@ -2,11 +2,11 @@ package lol.bai.badpackets.impl.mixin.client;
 
 import com.mojang.authlib.GameProfile;
 import lol.bai.badpackets.impl.handler.ClientPacketHandler;
-import net.minecraft.client.ClientTelemetryManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.telemetry.WorldSessionTelemetryManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -31,7 +31,7 @@ public class MixinClientPacketListener implements ClientPacketHandler.Holder {
     private ClientPacketHandler badpacket_packetHandler;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void badpackets_createClientPacketHandler(Minecraft $$0, Screen $$1, Connection $$2, ServerData $$3, GameProfile $$4, ClientTelemetryManager $$5, CallbackInfo ci) {
+    private void badpackets_createClientPacketHandler(Minecraft $$0, Screen $$1, Connection $$2, ServerData $$3, GameProfile $$4, WorldSessionTelemetryManager $$5, CallbackInfo ci) {
         badpacket_packetHandler = new ClientPacketHandler(minecraft, (ClientPacketListener) (Object) this);
     }
 
