@@ -27,7 +27,7 @@ public class MixinServerGamePacketListenerImpl implements ServerPacketHandler.Ho
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void badpackets_createServerPacketHandler(MinecraftServer minecraftServer, Connection connection, ServerPlayer serverPlayer, CallbackInfo ci) {
-        badpacket_packetHandler = new ServerPacketHandler(minecraftServer, (ServerGamePacketListenerImpl) (Object) this);
+        badpacket_packetHandler = new ServerPacketHandler(minecraftServer, (ServerGamePacketListenerImpl) (Object) this, connection);
     }
 
     @Inject(method = "onDisconnect", at = @At("HEAD"))
