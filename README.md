@@ -8,7 +8,12 @@ This mod **DOES NOT** magically make all mods that have versions for different p
 ## Project Setup
 ```gradle
 repositories {
-    maven { url "https://maven.bai.lol" }
+    maven {
+        url "https://maven2.bai.lol"
+        content {
+            includeGroup "lol.bai"
+        }
+    }
 }
 ```
 
