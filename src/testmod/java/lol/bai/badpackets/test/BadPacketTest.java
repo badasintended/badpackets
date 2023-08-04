@@ -1,8 +1,7 @@
 package lol.bai.badpackets.test;
 
 import io.netty.buffer.Unpooled;
-import lol.bai.badpackets.api.C2SPacketReceiver;
-import lol.bai.badpackets.api.S2CPacketReceiver;
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.event.PacketSenderReadyCallback;
 import lol.bai.badpackets.impl.Constants;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,22 +18,40 @@ public class BadPacketTest {
     public static final Logger LOGGER = LogManager.getLogger(BadPacketTest.class);
 
     public static void server() {
-        C2SPacketReceiver.register(C2S, (server, player, handler, buf, responseSender) ->
-            server.execute(() -> LOGGER.info(C2S)));
+        PacketReceiver.registerC2S(C2S, (server, player, handler, buf, responseSender) ->
+            LOGGER.info(buf.readUtf()));
+
+        PacketReceiver.registerC2S(TestPayload.ID, TestPayload::new, (server, player, handler, payload, responseSender) ->
+            LOGGER.info(payload.msg()));
 
         PacketSenderReadyCallback.registerServer((handler, sender, server) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.S2C));
-            sender.send(BadPacketTest.S2C, new FriendlyByteBuf(Unpooled.buffer()));
+            Validate.isTrue(sender.canSend(TestPayload.ID));
+
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+            buf.writeUtf("[untyped] server -> client");
+            sender.send(BadPacketTest.S2C, buf);
+
+            sender.send(new TestPayload("[typed] server -> client"));
         });
     }
 
     public static void client() {
-        S2CPacketReceiver.register(S2C, (client, handler, buf, responseSender) ->
-            client.execute(() -> LOGGER.info(S2C)));
+        PacketReceiver.registerS2C(S2C, (client, handler, buf, responseSender) ->
+            LOGGER.info(buf.readUtf()));
+
+        PacketReceiver.registerS2C(TestPayload.ID, TestPayload::new, (client, handler, payload, responseSender) ->
+            LOGGER.info(payload.msg()));
 
         PacketSenderReadyCallback.registerClient((handler, sender, client) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.C2S));
-            sender.send(BadPacketTest.C2S, new FriendlyByteBuf(Unpooled.buffer()));
+            Validate.isTrue(sender.canSend(TestPayload.ID));
+
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+            buf.writeUtf("[untyped] client -> server");
+            sender.send(BadPacketTest.C2S, buf);
+
+            sender.send(new TestPayload("[typed] client -> server"));
         });
     }
 

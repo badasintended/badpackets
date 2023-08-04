@@ -79,7 +79,7 @@ ij_java_doc_add_blank_line_after_return = true
 ij_java_doc_add_p_tag_on_empty_lines = true
 ij_java_doc_align_exception_comments = true
 ij_java_doc_align_param_comments = true
-ij_java_doc_do_not_wrap_if_one_line = false
+ij_java_doc_do_not_wrap_if_one_line = true
 ij_java_doc_enable_formatting = true
 ij_java_doc_enable_leading_asterisks = true
 ij_java_doc_indent_on_continuation = false
@@ -87,7 +87,7 @@ ij_java_doc_keep_empty_lines = true
 ij_java_doc_keep_empty_parameter_tag = false
 ij_java_doc_keep_empty_return_tag = false
 ij_java_doc_keep_empty_throws_tag = false
-ij_java_doc_keep_invalid_tags = false
+ij_java_doc_keep_invalid_tags = true
 ij_java_doc_param_description_on_new_line = false
 ij_java_doc_preserve_line_breaks = true
 ij_java_doc_use_throws_not_exception_tag = true
@@ -104,7 +104,7 @@ ij_java_for_statement_wrap = off
 ij_java_generate_final_locals = false
 ij_java_generate_final_parameters = false
 ij_java_if_brace_force = never
-ij_java_imports_layout = java.**, javax.**, |, *, |, $*
+# ij_java_imports_layout = java.**, javax.**, |, *, |, $*
 ij_java_indent_case_from_switch = true
 ij_java_insert_inner_class_imports = false
 ij_java_insert_override_annotation = true
@@ -112,7 +112,7 @@ ij_java_keep_blank_lines_before_right_brace = 2
 ij_java_keep_blank_lines_between_package_declaration_and_header = 2
 ij_java_keep_blank_lines_in_code = 2
 ij_java_keep_blank_lines_in_declarations = 2
-ij_java_keep_control_statement_in_one_line = false
+ij_java_keep_control_statement_in_one_line = true
 ij_java_keep_first_column_comment = false
 ij_java_keep_indents_on_empty_lines = false
 ij_java_keep_line_breaks = true
@@ -457,22 +457,23 @@ ij_groovy_while_brace_force = never
 ij_groovy_while_on_new_line = false
 ij_groovy_wrap_long_lines = false
 
-[{*.har, *.json}]
+[*.json]
 indent_size = 2
 tab_width = 2
 ij_continuation_indent_size = 2
 ij_json_keep_blank_lines_in_code = 1
 ij_json_keep_indents_on_empty_lines = false
 ij_json_keep_line_breaks = true
+ij_json_property_alignment = align_on_colon
 ij_json_space_after_colon = true
 ij_json_space_after_comma = true
-ij_json_space_before_colon = true
+ij_json_space_before_colon = false
 ij_json_space_before_comma = false
 ij_json_spaces_within_braces = false
 ij_json_spaces_within_brackets = false
 ij_json_wrap_long_lines = false
 
-[{*.yaml, *.yml}]
+[{*.yaml,*.yml}]
 indent_size = 2
 ij_yaml_keep_indents_on_empty_lines = false
 ij_yaml_keep_line_breaks = true

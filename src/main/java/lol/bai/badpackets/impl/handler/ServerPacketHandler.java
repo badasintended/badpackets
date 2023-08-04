@@ -1,17 +1,17 @@
 package lol.bai.badpackets.impl.handler;
 
-import lol.bai.badpackets.api.C2SPacketReceiver;
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.event.PacketSenderReadyCallback;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public class ServerPacketHandler extends AbstractPacketHandler<C2SPacketReceiver> {
+public class ServerPacketHandler extends AbstractPacketHandler<PacketReceiver.C2S<CustomPacketPayload>> {
 
     private final MinecraftServer server;
     private final ServerGamePacketListenerImpl handler;
@@ -34,8 +34,8 @@ public class ServerPacketHandler extends AbstractPacketHandler<C2SPacketReceiver
     }
 
     @Override
-    protected void receive(C2SPacketReceiver receiver, FriendlyByteBuf buf) {
-        receiver.receive(server, handler.getPlayer(), handler, buf, this);
+    protected void receive(PacketReceiver.C2S<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+        receiver.receive(server, handler.getPlayer(), handler, payload, this);
     }
 
     public interface Holder {

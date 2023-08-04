@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerList.class)
 public class MixinPlayerList {
 
-    @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ClientboundCustomPayloadPacket;<init>(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/network/FriendlyByteBuf;)V"))
-    private void badpackets_initServerPlayPacketHandler(Connection netManager, ServerPlayer player, CallbackInfo ci) {
+    @Inject(method = "placeNewPlayer", at = @At("TAIL"))
+    private void badpackets_initServerPlayPacketHandler(Connection netManager, ServerPlayer player, int latency, CallbackInfo ci) {
         ServerPacketHandler.get(player).sendInitialChannelSyncPacket();
     }
 

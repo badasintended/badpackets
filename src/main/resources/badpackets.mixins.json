@@ -5,11 +5,16 @@
   "compatibilityLevel": "JAVA_16",
   "refmap"            : "badpackets.refmap.json",
   "mixins"            : [
-    "MixinConnection",
+    "AccessServerboundCustomPayloadPacket",
     "MixinPlayerList",
+    "MixinServerboundCustomPayloadPacket",
+    "MixinServerCommonPacketListenerImpl",
     "MixinServerGamePacketListenerImpl"
   ],
   "client"            : [
+    "client.AccessClientboundCustomPayloadPacket",
+    "client.MixinClientboundCustomPayloadPacket",
+    "client.MixinClientCommonPacketListenerImpl",
     "client.MixinClientPacketListener"
   ],
   "injectors"         : {

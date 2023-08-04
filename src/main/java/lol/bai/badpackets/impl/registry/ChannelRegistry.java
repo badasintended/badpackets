@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import lol.bai.badpackets.api.C2SPacketReceiver;
-import lol.bai.badpackets.api.S2CPacketReceiver;
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public class ChannelRegistry<T> {
@@ -18,8 +18,8 @@ public class ChannelRegistry<T> {
         Constants.MC_REGISTER_CHANNEL,
         Constants.MC_UNREGISTER_CHANNEL);
 
-    public static final ChannelRegistry<S2CPacketReceiver> S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
-    public static final ChannelRegistry<C2SPacketReceiver> C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<PacketReceiver.S2C<CustomPacketPayload>> S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<PacketReceiver.C2S<CustomPacketPayload>> C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
     public final Map<ResourceLocation, T> channels = new HashMap<>();
 

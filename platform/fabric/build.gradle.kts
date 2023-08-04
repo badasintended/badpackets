@@ -13,6 +13,10 @@ dependencies {
 
 loom {
     mixin.defaultRefmapName.set("badpackets.refmap.json")
+
+    runs.forEach {
+        it.isIdeConfigGenerated = true
+    }
 }
 
 tasks.processResources {
