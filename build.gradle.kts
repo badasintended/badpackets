@@ -44,6 +44,11 @@ subprojects {
                     password = env["GITHUB_TOKEN"]
                 }
             }
+
+            maven {
+                name = "B2"
+                url = rootProject.projectDir.resolve(".b2").toURI()
+            }
         }
     }
 }
