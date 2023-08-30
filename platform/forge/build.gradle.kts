@@ -1,7 +1,7 @@
 import net.minecraftforge.gradle.common.util.RunConfig
 
 plugins {
-    id("net.minecraftforge.gradle")
+    id("net.neoforged.gradle")
     id("org.spongepowered.mixin")
 }
 
