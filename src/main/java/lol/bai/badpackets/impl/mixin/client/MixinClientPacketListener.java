@@ -10,7 +10,6 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,13 +38,10 @@ public class MixinClientPacketListener implements ClientPacketHandler.Holder {
         badpacket_packetHandler.onDisconnect();
     }
 
-    @Inject(method = "handleLogin", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
-    private void badpackets_initClientPacketHandler(ClientboundLoginPacket packet, CallbackInfo ci) {
-        badpacket_packetHandler.sendInitialChannelSyncPacket();
-    }
-
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void badpackets_receiveS2CPacket(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
+        badpacket_packetHandler.sendInitialChannelSyncPacket();
+
         if (!minecraft.isSameThread()) {
             FriendlyByteBuf buf = packet.getData();
             try {
