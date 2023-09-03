@@ -1,11 +1,15 @@
 import net.minecraftforge.gradle.common.util.RunConfig
 
 plugins {
-    id("net.minecraftforge.gradle")
+    id("net.neoforged.gradle")
     id("org.spongepowered.mixin")
 }
 
 setupPlatform()
+
+repositories {
+    maven("https://maven.minecraftforge.net")
+}
 
 dependencies {
     minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")

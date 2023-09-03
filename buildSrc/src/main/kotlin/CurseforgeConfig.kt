@@ -1,48 +1,45 @@
-import com.matthewprenger.cursegradle.CurseArtifact
-import com.matthewprenger.cursegradle.CurseExtension
-import com.matthewprenger.cursegradle.CurseProject
-import com.matthewprenger.cursegradle.CurseRelation
+import net.darkhax.curseforgegradle.Constants
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.closureOf
-import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
 
 fun <T : Jar> UploadConfig.curseforge(task: T) = project.run {
-    apply(plugin = "com.matthewprenger.cursegradle")
+    apply(plugin = "net.darkhax.curseforgegradle")
 
-    env["CURSEFORGE_API"]?.let { CURSEFORGE_API ->
-        configure<CurseExtension> {
-            apiKey = CURSEFORGE_API
-            project(closureOf<CurseProject> {
-                id = rootProp["cf.projectId"]
-                releaseType = prop["cf.releaseType"]
+    tasks.create<TaskPublishCurseForge>("curseforge") {
+        group = "publishing"
+        dependsOn("build")
 
-                changelogType = "markdown"
-                changelog = "https://github.com/badasintended/badpackets/releases/tag/${project.version}"
+        disableVersionDetection()
 
-                prop["cf.loader"].split(", ").forEach(this::addGameVersion)
-                prop["cf.gameVersion"].split(", ").forEach(this::addGameVersion)
+        apiToken = env["CURSEFORGE_API"]
+        apiEndpoint = "https://${prop["cf.endpoint"]}"
 
-                mainArtifact(task, closureOf<CurseArtifact> {
-                    displayName = "[${prop["cf.loader"].replace(", ", "/")}] ${project.version}"
-                })
+        upload(prop["cf.projectId"], task).apply {
+            displayName = "[${project.name.capitalize()} ${rootProp["minecraft"]}] ${project.version}"
+            releaseType = prop["cf.releaseType"]
 
-                if(listOf("cf.require", "cf.optional", "cf.break").any { prop.has(it) }) relations(closureOf<CurseRelation> {
-                    prop.ifPresent("cf.require") {
-                        it.split(", ").forEach(this::requiredDependency)
+            changelogType = "markdown"
+            changelog = env["CHANGELOG"]
+
+            prop["cf.gameVersion"].split(", ").forEach(this::addGameVersion)
+
+            prop["cf.loader"].split(", ").forEach {
+                addModLoader(it)
+            }
+
+            fun relation(key: String, type: String) {
+                prop.ifPresent("cf.${key}") { value ->
+                    value.split(", ").forEach {
+                        addRelation(it, type)
                     }
-                    prop.ifPresent("cf.optional") {
-                        it.split(", ").forEach(this::optionalDependency)
-                    }
-                    prop.ifPresent("cf.break") {
-                        it.split(", ").forEach(this::incompatible)
-                    }
-                })
-
-                afterEvaluate {
-                    uploadTask.dependsOn("build")
                 }
-            })
+            }
+
+            relation("require", Constants.RELATION_REQUIRED);
+            relation("optional", Constants.RELATION_OPTIONAL);
+            relation("break", Constants.RELATION_INCOMPATIBLE);
         }
     }
 }
