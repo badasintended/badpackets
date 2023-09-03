@@ -7,6 +7,10 @@ plugins {
 
 setupPlatform()
 
+repositories {
+    maven("https://maven.minecraftforge.net")
+}
+
 dependencies {
     minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")
 
