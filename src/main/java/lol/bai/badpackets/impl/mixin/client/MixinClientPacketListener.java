@@ -7,7 +7,6 @@ import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,13 +29,9 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
         badpacket_packetHandler.onDisconnect();
     }
 
-    @Inject(method = "handleLogin", at = @At("TAIL"))
-    private void badpackets_initClientPacketHandler(ClientboundLoginPacket packet, CallbackInfo ci) {
-        badpacket_packetHandler.sendInitialChannelSyncPacket();
-    }
-
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void badpackets_receiveS2CPacket(CustomPacketPayload payload, CallbackInfo ci) {
+        badpacket_packetHandler.sendInitialChannelSyncPacket();
         if (badpacket_packetHandler.receive(payload)) ci.cancel();
     }
 
