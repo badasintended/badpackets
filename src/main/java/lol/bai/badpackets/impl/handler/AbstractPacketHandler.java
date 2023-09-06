@@ -63,6 +63,10 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
         }
     }
 
+    public static void addChannelSyncReader(Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> map) {
+        map.put(Constants.CHANNEL_SYNC, UntypedPayload.reader(Constants.CHANNEL_SYNC));
+    }
+
     public boolean receive(CustomPacketPayload payload) {
         ResourceLocation id = payload.id();
 
@@ -122,7 +126,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
         sendVanillaChannelRegisterPacket(Set.of(id));
     }
 
-    public void onDisconnect() {
+    public void remove() {
         registry.removeHandler(this);
     }
 

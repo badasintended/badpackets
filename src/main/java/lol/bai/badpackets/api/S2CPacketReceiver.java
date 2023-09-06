@@ -1,19 +1,24 @@
 package lol.bai.badpackets.api;
 
+import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 @ApiSide.ClientOnly
 @FunctionalInterface
-public interface S2CPacketReceiver extends PacketReceiver.S2C<FriendlyByteBuf> {
+public interface S2CPacketReceiver extends PlayPackets.ClientReceiver<FriendlyByteBuf> {
 
+    /**
+     * @deprecated use {@link PlayPackets#registerClientReceiver(ResourceLocation, PlayPackets.ClientReceiver)}
+     */
     @ApiSide.ClientOnly
+    @Deprecated(forRemoval = true)
     static void register(ResourceLocation id, S2CPacketReceiver receiver) {
-        PacketReceiver.registerS2C(id, receiver);
+        PlayPackets.registerClientReceiver(id, receiver);
     }
 
     @Override

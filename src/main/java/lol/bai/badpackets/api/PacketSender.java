@@ -1,8 +1,8 @@
 package lol.bai.badpackets.api;
 
-import lol.bai.badpackets.api.event.PacketSenderReadyCallback;
-import lol.bai.badpackets.impl.handler.ClientPacketHandler;
-import lol.bai.badpackets.impl.handler.ServerPacketHandler;
+import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.impl.handler.ClientPlayPacketHandler;
+import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import net.minecraft.network.FriendlyByteBuf;
@@ -21,11 +21,12 @@ public interface PacketSender {
      * <p>
      * <b>Only available when on game.</b>
      *
-     * @see PacketSenderReadyCallback#registerClient(PacketSenderReadyCallback.Client)
+     * @see PlayPackets#registerServerReceiver(ResourceLocation, PlayPackets.ServerReceiver)
+     * @see PlayPackets#registerServerReceiver(ResourceLocation, FriendlyByteBuf.Reader, PlayPackets.ServerReceiver)
      */
     @ApiSide.ClientOnly
     static PacketSender c2s() {
-        return ClientPacketHandler.get();
+        return ClientPlayPacketHandler.get();
     }
 
     /**
@@ -33,17 +34,21 @@ public interface PacketSender {
      *
      * @param player the player that we want to send packets to.
      *
-     * @see PacketSenderReadyCallback#registerServer(PacketSenderReadyCallback.Server)
+     * @see PlayPackets#registerClientReceiver(ResourceLocation, PlayPackets.ClientReceiver)
+     * @see PlayPackets#registerClientReceiver(ResourceLocation, FriendlyByteBuf.Reader, PlayPackets.ClientReceiver)
      */
     @ApiSide.ServerOnly
     static PacketSender s2c(ServerPlayer player) {
-        return ServerPacketHandler.get(player);
+        return ServerPlayPacketHandler.get(player);
     }
 
     /**
      * Returns whether the target can receive a packet with the specified id.
      * <p>
      * <b>Note:</b> Only works for Bad Packets channels.
+     *
+     * @see PlayPackets#registerClientReadyCallback(PlayPackets.ClientReadyCallback)
+     * @see PlayPackets#registerServerReadyCallback(PlayPackets.ServerReadyCallback)
      */
     boolean canSend(ResourceLocation id);
 

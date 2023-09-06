@@ -1,12 +1,13 @@
 package lol.bai.badpackets.impl.mixin.client;
 
-import lol.bai.badpackets.impl.handler.ClientPacketHandler;
+import lol.bai.badpackets.impl.handler.ClientPlayPacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.game.ClientboundStartConfigurationPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPacketListener.class)
-public abstract class MixinClientPacketListener extends MixinClientCommonPacketListenerImpl implements ClientPacketHandler.Holder {
+public abstract class MixinClientPacketListener extends MixinClientCommonPacketListenerImpl implements ClientPlayPacketHandler.Holder {
 
     @Unique
-    private ClientPacketHandler badpacket_packetHandler;
+    private ClientPlayPacketHandler badpacket_packetHandler;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void badpackets_createClientPacketHandler(Minecraft $$0, Connection $$1, CommonListenerCookie $$2, CallbackInfo ci) {
-        badpacket_packetHandler = new ClientPacketHandler(minecraft, (ClientPacketListener) (Object) this);
+        badpacket_packetHandler = new ClientPlayPacketHandler(minecraft, (ClientPacketListener) (Object) this);
     }
 
     @Override
     protected void badpackets_removeClientPacketHandler(Component reason) {
-        badpacket_packetHandler.onDisconnect();
+        badpacket_packetHandler.remove();
     }
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
@@ -35,8 +36,13 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
         if (badpacket_packetHandler.receive(payload)) ci.cancel();
     }
 
+    @Inject(method = "handleConfigurationStart", at = @At("RETURN"))
+    private void badpackets_removeHandler(ClientboundStartConfigurationPacket $$0, CallbackInfo ci) {
+        badpacket_packetHandler.remove();
+    }
+
     @Override
-    public ClientPacketHandler badpackets_getHandler() {
+    public ClientPlayPacketHandler badpackets_getHandler() {
         return badpacket_packetHandler;
     }
 

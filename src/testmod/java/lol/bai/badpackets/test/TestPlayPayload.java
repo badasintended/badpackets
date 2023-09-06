@@ -6,13 +6,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public record TestPayload(
+public record TestPlayPayload(
     String msg
 ) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = Constants.id("test/payload");
+    public static final ResourceLocation ID = Constants.id("test/play/payload");
 
-    public TestPayload(FriendlyByteBuf buf) {
+    public TestPlayPayload(FriendlyByteBuf buf) {
         this(buf.readUtf());
     }
 

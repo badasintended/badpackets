@@ -3,6 +3,7 @@ package lol.bai.badpackets.impl.mixin.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -26,6 +27,7 @@ public class MixinClientboundCustomPayloadPacket {
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void badpackets_makeReaderMapMutable(CallbackInfo ci) {
         KNOWN_TYPES = new HashMap<>(KNOWN_TYPES);
+        AbstractPacketHandler.addChannelSyncReader(KNOWN_TYPES);
     }
 
 }

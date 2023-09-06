@@ -9,12 +9,14 @@
     "MixinPlayerList",
     "MixinServerboundCustomPayloadPacket",
     "MixinServerCommonPacketListenerImpl",
+    "MixinServerConfigurationPacketListenerImpl",
     "MixinServerGamePacketListenerImpl"
   ],
   "client"            : [
     "client.AccessClientboundCustomPayloadPacket",
     "client.MixinClientboundCustomPayloadPacket",
     "client.MixinClientCommonPacketListenerImpl",
+    "client.MixinClientConfigurationPacketListenerImpl",
     "client.MixinClientPacketListener"
   ],
   "injectors"         : {

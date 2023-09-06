@@ -1,32 +1,42 @@
 package lol.bai.badpackets.api.event;
 
 import lol.bai.badpackets.api.PacketSender;
+import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.impl.marker.ApiSide;
-import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-/**
- * Callback called after player joined the server.
- * This is the first point the {@link PacketSender}s are available.
- */
+@Deprecated(forRemoval = true)
 public final class PacketSenderReadyCallback {
 
+    /**
+     * @deprecated use {@link PlayPackets#registerServerReadyCallback(PlayPackets.ServerReadyCallback)}
+     */
+    @Deprecated(forRemoval = true)
     @ApiSide.ServerOnly
     public static void registerServer(Server callback) {
-        CallbackRegistry.SERVER_PLAYER_JOIN.add(callback);
+        PlayPackets.registerServerReadyCallback(callback);
     }
 
+    /**
+     * @deprecated use {@link PlayPackets#registerClientReadyCallback(PlayPackets.ClientReadyCallback)}
+     */
+    @Deprecated(forRemoval = true)
     @ApiSide.ClientOnly
     public static void registerClient(Client callback) {
-        CallbackRegistry.CLIENT_PLAYER_JOIN.add(callback);
+        PlayPackets.registerClientReadyCallback(callback);
     }
 
     @ApiSide.ServerOnly
     @FunctionalInterface
-    public interface Server {
+    public interface Server extends PlayPackets.ServerReadyCallback {
+
+        @Override
+        default void onReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) {
+            onJoin(handler, sender, server);
+        }
 
         void onJoin(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server);
 
@@ -34,7 +44,12 @@ public final class PacketSenderReadyCallback {
 
     @ApiSide.ClientOnly
     @FunctionalInterface
-    public interface Client {
+    public interface Client extends PlayPackets.ClientReadyCallback {
+
+        @Override
+        default void onReady(ClientPacketListener handler, PacketSender sender, Minecraft client) {
+            onJoin(handler, sender, client);
+        }
 
         void onJoin(ClientPacketListener handler, PacketSender sender, Minecraft client);
 
