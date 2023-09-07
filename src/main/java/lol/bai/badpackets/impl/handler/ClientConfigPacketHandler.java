@@ -1,6 +1,7 @@
 package lol.bai.badpackets.impl.handler;
 
-import lol.bai.badpackets.api.config.ConfigPackets;
+import lol.bai.badpackets.api.config.ClientConfigPacketReadyCallback;
+import lol.bai.badpackets.api.config.ClientConfigPacketReceiver;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.client.Minecraft;
@@ -9,7 +10,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public class ClientConfigPacketHandler extends AbstractPacketHandler<ConfigPackets.ClientReceiver<CustomPacketPayload>> {
+public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfigPacketReceiver<CustomPacketPayload>> {
 
     private final Minecraft client;
     private final ClientConfigurationPacketListenerImpl listener;
@@ -23,7 +24,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ConfigPacke
 
     @Override
     protected void onInitialChannelSyncPacketReceived() {
-        for (ConfigPackets.ClientReadyCallback callback : CallbackRegistry.CLIENT_READY_CONFIG) {
+        for (ClientConfigPacketReadyCallback callback : CallbackRegistry.CLIENT_READY_CONFIG) {
             callback.onConfig(listener, this, client);
         }
 
@@ -31,7 +32,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ConfigPacke
     }
 
     @Override
-    protected void receive(ConfigPackets.ClientReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receive(ClientConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(client, listener, payload, this);
     }
 

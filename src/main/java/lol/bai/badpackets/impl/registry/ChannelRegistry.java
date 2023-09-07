@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import lol.bai.badpackets.api.config.ConfigPackets;
-import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.config.ClientConfigPacketReceiver;
+import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
+import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
+import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -19,11 +21,11 @@ public class ChannelRegistry<T> {
         Constants.MC_REGISTER_CHANNEL,
         Constants.MC_UNREGISTER_CHANNEL);
 
-    public static final ChannelRegistry<ConfigPackets.ClientReceiver<CustomPacketPayload>> CONFIG_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
-    public static final ChannelRegistry<ConfigPackets.ServerReceiver<CustomPacketPayload>> CONFIG_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<ClientConfigPacketReceiver<CustomPacketPayload>> CONFIG_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<ServerConfigPacketReceiver<CustomPacketPayload>> CONFIG_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
-    public static final ChannelRegistry<PlayPackets.ClientReceiver<CustomPacketPayload>> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
-    public static final ChannelRegistry<PlayPackets.ServerReceiver<CustomPacketPayload>> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<ClientPlayPacketReceiver<CustomPacketPayload>> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<ServerPlayPacketReceiver<CustomPacketPayload>> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
     public final Map<ResourceLocation, T> channels = new HashMap<>();
 

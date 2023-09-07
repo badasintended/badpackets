@@ -1,6 +1,7 @@
 package lol.bai.badpackets.api;
 
 import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -11,10 +12,10 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 @Deprecated(forRemoval = true)
 @ApiSide.ServerOnly
 @FunctionalInterface
-public interface C2SPacketReceiver extends PlayPackets.ServerReceiver<FriendlyByteBuf> {
+public interface C2SPacketReceiver extends ServerPlayPacketReceiver<FriendlyByteBuf> {
 
     /**
-     * @deprecated use {@link PlayPackets#registerServerReceiver(ResourceLocation, PlayPackets.ServerReceiver)}
+     * @deprecated use {@link PlayPackets#registerServerReceiver(ResourceLocation, ServerPlayPacketReceiver)}
      */
     @Deprecated(forRemoval = true)
     static void register(ResourceLocation id, C2SPacketReceiver receiver) {

@@ -1,7 +1,9 @@
 package lol.bai.badpackets.api.event;
 
 import lol.bai.badpackets.api.PacketSender;
+import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -12,7 +14,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 public final class PacketSenderReadyCallback {
 
     /**
-     * @deprecated use {@link PlayPackets#registerServerReadyCallback(PlayPackets.ServerReadyCallback)}
+     * @deprecated use {@link PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)}
      */
     @Deprecated(forRemoval = true)
     @ApiSide.ServerOnly
@@ -21,7 +23,7 @@ public final class PacketSenderReadyCallback {
     }
 
     /**
-     * @deprecated use {@link PlayPackets#registerClientReadyCallback(PlayPackets.ClientReadyCallback)}
+     * @deprecated use {@link PlayPackets#registerClientReadyCallback(ClientPlayPacketReadyCallback)}
      */
     @Deprecated(forRemoval = true)
     @ApiSide.ClientOnly
@@ -31,7 +33,7 @@ public final class PacketSenderReadyCallback {
 
     @ApiSide.ServerOnly
     @FunctionalInterface
-    public interface Server extends PlayPackets.ServerReadyCallback {
+    public interface Server extends ServerPlayPacketReadyCallback {
 
         @Override
         default void onReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) {
@@ -44,7 +46,7 @@ public final class PacketSenderReadyCallback {
 
     @ApiSide.ClientOnly
     @FunctionalInterface
-    public interface Client extends PlayPackets.ClientReadyCallback {
+    public interface Client extends ClientPlayPacketReadyCallback {
 
         @Override
         default void onReady(ClientPacketListener handler, PacketSender sender, Minecraft client) {

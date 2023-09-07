@@ -1,6 +1,10 @@
 package lol.bai.badpackets.api;
 
+import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
+import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
 import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
+import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
 import lol.bai.badpackets.impl.handler.ClientPlayPacketHandler;
 import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
@@ -21,8 +25,8 @@ public interface PacketSender {
      * <p>
      * <b>Only available when on game.</b>
      *
-     * @see PlayPackets#registerServerReceiver(ResourceLocation, PlayPackets.ServerReceiver)
-     * @see PlayPackets#registerServerReceiver(ResourceLocation, FriendlyByteBuf.Reader, PlayPackets.ServerReceiver)
+     * @see PlayPackets#registerServerReceiver(ResourceLocation, ServerPlayPacketReceiver)
+     * @see PlayPackets#registerServerReceiver(ResourceLocation, FriendlyByteBuf.Reader, ServerPlayPacketReceiver)
      */
     @ApiSide.ClientOnly
     static PacketSender c2s() {
@@ -34,8 +38,8 @@ public interface PacketSender {
      *
      * @param player the player that we want to send packets to.
      *
-     * @see PlayPackets#registerClientReceiver(ResourceLocation, PlayPackets.ClientReceiver)
-     * @see PlayPackets#registerClientReceiver(ResourceLocation, FriendlyByteBuf.Reader, PlayPackets.ClientReceiver)
+     * @see PlayPackets#registerClientReceiver(ResourceLocation, ClientPlayPacketReceiver)
+     * @see PlayPackets#registerClientReceiver(ResourceLocation, FriendlyByteBuf.Reader, ClientPlayPacketReceiver)
      */
     @ApiSide.ServerOnly
     static PacketSender s2c(ServerPlayer player) {
@@ -47,8 +51,8 @@ public interface PacketSender {
      * <p>
      * <b>Note:</b> Only works for Bad Packets channels.
      *
-     * @see PlayPackets#registerClientReadyCallback(PlayPackets.ClientReadyCallback)
-     * @see PlayPackets#registerServerReadyCallback(PlayPackets.ServerReadyCallback)
+     * @see PlayPackets#registerClientReadyCallback(ClientPlayPacketReadyCallback)
+     * @see PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)
      */
     boolean canSend(ResourceLocation id);
 

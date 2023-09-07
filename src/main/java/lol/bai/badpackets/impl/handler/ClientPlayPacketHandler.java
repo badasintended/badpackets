@@ -1,6 +1,7 @@
 package lol.bai.badpackets.impl.handler;
 
-import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
+import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.client.Minecraft;
@@ -8,7 +9,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public class ClientPlayPacketHandler extends AbstractPacketHandler<PlayPackets.ClientReceiver<CustomPacketPayload>> {
+public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPacketReceiver<CustomPacketPayload>> {
 
     private final Minecraft client;
     private final ClientPacketListener listener;
@@ -31,13 +32,13 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<PlayPackets.C
 
     @Override
     protected void onInitialChannelSyncPacketReceived() {
-        for (PlayPackets.ClientReadyCallback callback : CallbackRegistry.CLIENT_PLAY) {
+        for (ClientPlayPacketReadyCallback callback : CallbackRegistry.CLIENT_PLAY) {
             callback.onReady(listener, this, client);
         }
     }
 
     @Override
-    protected void receive(PlayPackets.ClientReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receive(ClientPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(client, listener, payload, this);
     }
 

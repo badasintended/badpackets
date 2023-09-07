@@ -59,6 +59,7 @@ minecraft {
 
 dependencies {
     compileOnly("org.spongepowered:mixin:0.8.5")
+    compileOnly("org.ow2.asm:asm:9.2")
 }
 
 sourceSets {

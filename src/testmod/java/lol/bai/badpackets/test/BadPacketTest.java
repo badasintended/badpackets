@@ -5,12 +5,15 @@ import lol.bai.badpackets.api.config.ConfigPackets;
 import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.impl.Constants;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class BadPacketTest {
+
+    public static final ResourceLocation CONFIG_TASK = Constants.id("test/config/task");
 
     public static final ResourceLocation CONFIG_C2S = Constants.id("test/config/c2s");
     public static final ResourceLocation CONFIG_S2C = Constants.id("test/config/s2c");
@@ -21,10 +24,34 @@ public class BadPacketTest {
     public static final Logger LOGGER = LogManager.getLogger(BadPacketTest.class);
 
     public static void server() {
-        ConfigPackets.registerServerReceiver(CONFIG_C2S, (server, handler, buf, responseSender) ->
+        // TASK --------------------------------------------------------------------------------------------------------
+
+        ConfigPackets.registerTask(CONFIG_TASK, (handler, sender, server) -> {
+            if (sender.canSend(TestTaskPayload.ID)) {
+                sender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_1));
+                return true;
+            }
+
+            return false;
+        });
+
+        ConfigPackets.registerServerReceiver(TestTaskPayload.ID, TestTaskPayload::new, (server, handler, payload, responseSender, taskFinisher) -> {
+            LOGGER.info("[config task] client -> server " + payload.stage().name());
+
+            switch (payload.stage()) {
+                case ANSWER_1 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_2));
+                case ANSWER_2 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_3));
+                case ANSWER_3 -> taskFinisher.finish(CONFIG_TASK);
+                default -> handler.disconnect(Component.literal("invalid stage"));
+            }
+        });
+
+        // CONFIG ------------------------------------------------------------------------------------------------------
+
+        ConfigPackets.registerServerReceiver(CONFIG_C2S, (server, handler, buf, responseSender, taskFinisher) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerServerReceiver(TestConfigPayload.ID, TestConfigPayload::new, (server, handler, payload, responseSender) ->
+        ConfigPackets.registerServerReceiver(TestConfigPayload.ID, TestConfigPayload::new, (server, handler, payload, responseSender, taskFinisher) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerServerReadyCallback((handler, sender, server) -> {
@@ -37,6 +64,8 @@ public class BadPacketTest {
 
             sender.send(new TestConfigPayload("[config typed] server -> client"));
         });
+
+        // PLAY --------------------------------------------------------------------------------------------------------
 
         PlayPackets.registerServerReceiver(PLAY_C2S, (server, player, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
@@ -57,6 +86,21 @@ public class BadPacketTest {
     }
 
     public static void client() {
+        // TASK --------------------------------------------------------------------------------------------------------
+
+        ConfigPackets.registerClientReceiver(TestTaskPayload.ID, TestTaskPayload::new, (client, handler, payload, responseSender) -> {
+            LOGGER.info("[config task] server -> client " + payload.stage().name());
+
+            switch (payload.stage()) {
+                case QUESTION_1 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_1));
+                case QUESTION_2 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_2));
+                case QUESTION_3 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_3));
+                default -> handler.onDisconnect(Component.literal("invalid stage"));
+            }
+        });
+
+        // CONFIG ------------------------------------------------------------------------------------------------------
+
         ConfigPackets.registerClientReceiver(CONFIG_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
@@ -73,6 +117,8 @@ public class BadPacketTest {
 
             sender.send(new TestConfigPayload("[config typed] client -> server"));
         });
+
+        // PLAY --------------------------------------------------------------------------------------------------------
 
         PlayPackets.registerClientReceiver(PLAY_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
