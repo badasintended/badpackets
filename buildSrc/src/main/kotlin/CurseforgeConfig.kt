@@ -17,7 +17,7 @@ fun <T : Jar> UploadConfig.curseforge(task: T) = project.run {
         apiEndpoint = "https://${prop["cf.endpoint"]}"
 
         upload(prop["cf.projectId"], task).apply {
-            displayName = "[${project.name.capitalize()} ${rootProp["minecraft"]}] ${project.version}"
+            displayName = "${prop["cf.prefix"]} ${project.version}"
             releaseType = prop["cf.releaseType"]
 
             changelogType = "markdown"
