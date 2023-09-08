@@ -21,8 +21,8 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
     private ClientPlayPacketHandler badpacket_packetHandler;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void badpackets_createClientPacketHandler(Minecraft $$0, Connection $$1, CommonListenerCookie $$2, CallbackInfo ci) {
-        badpacket_packetHandler = new ClientPlayPacketHandler(minecraft, (ClientPacketListener) (Object) this);
+    private void badpackets_createClientPacketHandler(Minecraft client, Connection connection, CommonListenerCookie cookie, CallbackInfo ci) {
+        badpacket_packetHandler = new ClientPlayPacketHandler(client, (ClientPacketListener) (Object) this);
     }
 
     @Override
