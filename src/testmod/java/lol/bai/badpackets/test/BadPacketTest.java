@@ -95,7 +95,7 @@ public class BadPacketTest {
                 case QUESTION_1 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_1));
                 case QUESTION_2 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_2));
                 case QUESTION_3 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_3));
-                default -> handler.onDisconnect(Component.literal("invalid stage"));
+                default -> ConfigPackets.disconnect(handler, Component.literal("invalid stage"));
             }
         });
 

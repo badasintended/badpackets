@@ -4,11 +4,14 @@ import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.handler.ServerConfigPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import lol.bai.badpackets.impl.mixin.AccessServerboundCustomPayloadPacket;
+import lol.bai.badpackets.impl.mixin.client.AccessClientCommonPacketListenerImpl;
 import lol.bai.badpackets.impl.mixin.client.AccessClientboundCustomPayloadPacket;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
+import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
@@ -76,6 +79,7 @@ public final class ConfigPackets {
      * @param receiver the receiver
      *
      * @see ClientConfigPacketReceiver#receive
+     * @see #disconnect
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientConfigPacketReceiver<FriendlyByteBuf> receiver) {
@@ -91,6 +95,7 @@ public final class ConfigPackets {
      * @param receiver the receiver
      *
      * @see ClientConfigPacketReceiver#receive
+     * @see #disconnect
      */
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
@@ -105,10 +110,23 @@ public final class ConfigPackets {
      * This is the first point that {@link PacketSender#canSend} will behave properly.
      * <p>
      * Not a general-purpose player join callback, use platform specific API for that.
+     *
+     * @see #disconnect
      */
     @ApiSide.ClientOnly
     public static void registerClientReadyCallback(ClientConfigPacketReadyCallback callback) {
         CallbackRegistry.CLIENT_READY_CONFIG.add(callback);
+    }
+
+    /**
+     * Helper method to disconnect client-to-server connection.
+     *
+     * @param handler the handler instance
+     * @param cause   the disconnection cause
+     */
+    @ApiSide.ClientOnly
+    public static void disconnect(ClientConfigurationPacketListenerImpl handler, Component cause) {
+        ((AccessClientCommonPacketListenerImpl) handler).badpackets_connection().disconnect(cause);
     }
 
     private ConfigPackets() {

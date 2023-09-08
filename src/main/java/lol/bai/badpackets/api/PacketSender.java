@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public interface PacketSender {
 
     /**
-     * Returns client-to-server packet sender.
+     * Returns client-to-server <b>play</b> packet sender.
      * <p>
      * <b>Only available when on game.</b>
      *
@@ -34,7 +34,7 @@ public interface PacketSender {
     }
 
     /**
-     * Returns a server-to-client packet sender.
+     * Returns a server-to-client <b>play</b> packet sender.
      *
      * @param player the player that we want to send packets to.
      *
