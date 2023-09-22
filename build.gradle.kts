@@ -2,7 +2,7 @@ import java.nio.charset.StandardCharsets
 
 plugins {
     java
-    id("org.spongepowered.gradle.vanilla")
+    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
     id("maven-publish")
 }
 

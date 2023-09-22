@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerConfigurationPacketListenerImpl.class)
 public abstract class MixinServerConfigurationPacketListenerImpl extends MixinServerCommonPacketListenerImpl implements ServerConfigPacketHandler.TaskFinisher {
@@ -60,9 +61,9 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
         badpackets_packetHandler.remove();
     }
 
-    @Inject(method = "startNextTask", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ConfigurationTask;start(Ljava/util/function/Consumer;)V"))
-    private void badpackets_attachCustomTaskContext(CallbackInfo ci) {
-        if (currentTask instanceof ServerConfigPacketHandler.CustomTask custom) {
+    @Inject(method = "startNextTask", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/network/ServerConfigurationPacketListenerImpl;currentTask:Lnet/minecraft/server/network/ConfigurationTask;"))
+    private void badpackets_attachCustomTaskContext(CallbackInfo ci, ConfigurationTask task) {
+        if (task instanceof ServerConfigPacketHandler.CustomTask custom) {
             custom.setHandler(badpackets_packetHandler);
         }
     }

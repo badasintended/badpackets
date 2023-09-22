@@ -12,6 +12,7 @@ import io.netty.buffer.Unpooled;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
+import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -142,7 +143,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
                 }
                 buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII));
             }
-            send(Constants.MC_REGISTER_CHANNEL, buf);
+            send(PlatformProxy.INSTANCE.createVanillaRegisterPayload(buf));
         }
     }
 
