@@ -32,6 +32,7 @@ public class ClientPacketHandler extends AbstractPacketHandler<S2CPacketReceiver
 
     @Override
     protected void onInitialChannelSyncPacketReceived() {
+        sendInitialChannelSyncPacket();
         for (PacketSenderReadyCallback.Client callback : CallbackRegistry.CLIENT_PLAYER_JOIN) {
             callback.onJoin(listener, this, Minecraft.getInstance());
         }

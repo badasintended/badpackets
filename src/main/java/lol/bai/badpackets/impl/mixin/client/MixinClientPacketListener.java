@@ -40,8 +40,6 @@ public class MixinClientPacketListener implements ClientPacketHandler.Holder {
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void badpackets_receiveS2CPacket(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
-        badpacket_packetHandler.sendInitialChannelSyncPacket();
-
         if (!minecraft.isSameThread()) {
             FriendlyByteBuf buf = packet.getData();
             try {
