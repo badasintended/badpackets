@@ -32,6 +32,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
 
     @Override
     protected void onInitialChannelSyncPacketReceived() {
+        sendInitialChannelSyncPacket();
         for (ClientPlayPacketReadyCallback callback : CallbackRegistry.CLIENT_PLAY) {
             callback.onReady(listener, this, client);
         }

@@ -32,7 +32,6 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void badpackets_receiveS2CPacket(CustomPacketPayload payload, CallbackInfo ci) {
-        badpacket_packetHandler.sendInitialChannelSyncPacket();
         if (badpacket_packetHandler.receive(payload)) ci.cancel();
     }
 
