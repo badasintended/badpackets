@@ -2,10 +2,13 @@ package lol.bai.badpackets.impl.handler;
 
 import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
+import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
@@ -28,6 +31,11 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
         }
 
         return ((ClientPlayPacketHandler.Holder) listener).badpackets_getHandler();
+    }
+
+    @Override
+    protected Packet<?> createVanillaRegisterPacket(FriendlyByteBuf buf) {
+        return PlatformProxy.INSTANCE.createVanillaRegisterPlayC2SPacket(buf);
     }
 
     @Override

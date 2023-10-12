@@ -8,9 +8,11 @@ import lol.bai.badpackets.api.config.ConfigTaskExecutor;
 import lol.bai.badpackets.api.config.ServerConfigPacketReadyCallback;
 import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
 import lol.bai.badpackets.impl.Constants;
+import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
@@ -41,6 +43,11 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
 
     public CallbackTask createCallbackTask() {
         return new CallbackTask();
+    }
+
+    @Override
+    protected Packet<?> createVanillaRegisterPacket(FriendlyByteBuf buf) {
+        return PlatformProxy.INSTANCE.createVanillaRegisterConfigS2CPacket(buf);
     }
 
     @Override
