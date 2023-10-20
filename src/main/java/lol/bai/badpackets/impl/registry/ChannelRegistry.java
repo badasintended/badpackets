@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
 import lol.bai.badpackets.api.config.ClientConfigPacketReceiver;
 import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
 import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
@@ -28,8 +29,8 @@ public class ChannelRegistry<T> {
         Constants.MC_REGISTER_CHANNEL,
         Constants.MC_UNREGISTER_CHANNEL);
 
-    private static final ReaderMapHolder C2S_READERS = new ReaderMapHolder(AccessServerboundCustomPayloadPacket::badpackets_getPacketReaders, AccessServerboundCustomPayloadPacket::badpackets_setPacketReaders);
-    private static final ReaderMapHolder S2C_READERS = new ReaderMapHolder(AccessClientboundCustomPayloadPacket::badpackets_getPacketReaders, AccessClientboundCustomPayloadPacket::badpackets_setPacketReaders);
+    private static final Supplier<ReaderMapHolder> C2S_READERS = Suppliers.memoize(() -> new ReaderMapHolder(AccessServerboundCustomPayloadPacket::badpackets_getPacketReaders, AccessServerboundCustomPayloadPacket::badpackets_setPacketReaders));
+    private static final Supplier<ReaderMapHolder> S2C_READERS = Suppliers.memoize(() -> new ReaderMapHolder(AccessClientboundCustomPayloadPacket::badpackets_getPacketReaders, AccessClientboundCustomPayloadPacket::badpackets_setPacketReaders));
 
     public static final ChannelRegistry<ClientConfigPacketReceiver<CustomPacketPayload>> CONFIG_S2C = new ChannelRegistry<>(RESERVED_CHANNELS, S2C_READERS);
     public static final ChannelRegistry<ServerConfigPacketReceiver<CustomPacketPayload>> CONFIG_C2S = new ChannelRegistry<>(RESERVED_CHANNELS, C2S_READERS);
@@ -40,11 +41,11 @@ public class ChannelRegistry<T> {
     private final Map<ResourceLocation, T> channels = new HashMap<>();
     private final Set<ResourceLocation> reservedChannels;
     private final Set<AbstractPacketHandler<T>> handlers = new HashSet<>();
-    private final ReaderMapHolder readersHolder;
+    private final Supplier<ReaderMapHolder> readersHolder;
 
     private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
 
-    private ChannelRegistry(Set<ResourceLocation> reservedChannels, ReaderMapHolder readersHolder) {
+    private ChannelRegistry(Set<ResourceLocation> reservedChannels, Supplier<ReaderMapHolder> readersHolder) {
         this.reservedChannels = reservedChannels;
         this.readersHolder = readersHolder;
     }
@@ -58,10 +59,10 @@ public class ChannelRegistry<T> {
                 throw new IllegalArgumentException("Reserved channel id " + id);
             }
 
-            Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> readers = readersHolder.getter.get();
+            Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> readers = readersHolder.get().getter.get();
             if (!(readers instanceof HashMap)) {
                 readers = new HashMap<>(readers);
-                readersHolder.setter.accept(readers);
+                readersHolder.get().setter.accept(readers);
             }
 
             readers.put(id, reader);
