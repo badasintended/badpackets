@@ -3,9 +3,7 @@ package lol.bai.badpackets.api.config;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.handler.ServerConfigPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
-import lol.bai.badpackets.impl.mixin.AccessServerboundCustomPayloadPacket;
 import lol.bai.badpackets.impl.mixin.client.AccessClientCommonPacketListenerImpl;
-import lol.bai.badpackets.impl.mixin.client.AccessClientboundCustomPayloadPacket;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
@@ -56,8 +54,7 @@ public final class ConfigPackets {
      */
     @SuppressWarnings("unchecked")
     public static <P extends CustomPacketPayload> void registerServerReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ServerConfigPacketReceiver<P> receiver) {
-        AccessServerboundCustomPayloadPacket.badpackets_getPacketReaders().put(id, reader);
-        ChannelRegistry.CONFIG_C2S.register(id, (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
+        ChannelRegistry.CONFIG_C2S.register(id, reader, (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
@@ -100,8 +97,7 @@ public final class ConfigPackets {
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
     public static <P extends CustomPacketPayload> void registerClientReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ClientConfigPacketReceiver<P> receiver) {
-        AccessClientboundCustomPayloadPacket.badpackets_getPacketReaders().put(id, reader);
-        ChannelRegistry.CONFIG_S2C.register(id, (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
+        ChannelRegistry.CONFIG_S2C.register(id, reader, (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**

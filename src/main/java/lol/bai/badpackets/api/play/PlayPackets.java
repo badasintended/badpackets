@@ -2,8 +2,6 @@ package lol.bai.badpackets.api.play;
 
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.marker.ApiSide;
-import lol.bai.badpackets.impl.mixin.AccessServerboundCustomPayloadPacket;
-import lol.bai.badpackets.impl.mixin.client.AccessClientboundCustomPayloadPacket;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
@@ -36,8 +34,7 @@ public final class PlayPackets {
      */
     @SuppressWarnings("unchecked")
     public static <P extends CustomPacketPayload> void registerServerReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ServerPlayPacketReceiver<P> receiver) {
-        AccessServerboundCustomPayloadPacket.badpackets_getPacketReaders().put(id, reader);
-        ChannelRegistry.PLAY_C2S.register(id, (ServerPlayPacketReceiver<CustomPacketPayload>) receiver);
+        ChannelRegistry.PLAY_C2S.register(id, reader, (ServerPlayPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
@@ -73,8 +70,7 @@ public final class PlayPackets {
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
     public static <P extends CustomPacketPayload> void registerClientReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ClientPlayPacketReceiver<P> receiver) {
-        AccessClientboundCustomPayloadPacket.badpackets_getPacketReaders().put(id, reader);
-        ChannelRegistry.PLAY_S2C.register(id, (ClientPlayPacketReceiver<CustomPacketPayload>) receiver);
+        ChannelRegistry.PLAY_S2C.register(id, reader, (ClientPlayPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
