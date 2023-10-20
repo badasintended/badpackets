@@ -5,8 +5,6 @@ import java.util.Queue;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.handler.ServerConfigPacketHandler;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.PacketUtils;
-import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.configuration.ServerboundFinishConfigurationPacket;
 import net.minecraft.server.MinecraftServer;
@@ -39,14 +37,10 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
     private ConfigurationTask currentTask;
 
     @Unique
-    private MinecraftServer badpackets_server;
-
-    @Unique
     private ServerConfigPacketHandler badpackets_packetHandler;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void badpackets_createPacketHandler(MinecraftServer server, Connection connection, CommonListenerCookie cookie, CallbackInfo ci) {
-        badpackets_server = server;
         badpackets_packetHandler = new ServerConfigPacketHandler(server, (ServerConfigurationPacketListenerImpl) (Object) this, connection);
     }
 
@@ -82,7 +76,6 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
 
     @Override
     protected boolean badpackets_handleCustomPayload(ServerboundCustomPayloadPacket packet) {
-        PacketUtils.ensureRunningOnSameThread(packet, (ServerCommonPacketListener) this, badpackets_server);
         return badpackets_packetHandler.receive(packet.payload());
     }
 

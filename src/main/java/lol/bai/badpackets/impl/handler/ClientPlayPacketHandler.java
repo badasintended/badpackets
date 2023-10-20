@@ -18,7 +18,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
     private final ClientPacketListener listener;
 
     public ClientPlayPacketHandler(Minecraft client, ClientPacketListener listener) {
-        super("ClientPlayPacketHandler", ChannelRegistry.PLAY_S2C, ServerboundCustomPayloadPacket::new, listener.getConnection());
+        super("ClientPlayPacketHandler", ChannelRegistry.PLAY_S2C, ServerboundCustomPayloadPacket::new, client, listener.getConnection());
 
         this.client = client;
         this.listener = listener;
@@ -47,7 +47,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
     }
 
     @Override
-    protected void receive(ClientPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receiveUnsafe(ClientPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(client, listener, payload, this);
     }
 

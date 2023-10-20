@@ -7,11 +7,13 @@ import lol.bai.badpackets.impl.mixin.client.AccessClientCommonPacketListenerImpl
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Utility for working with configuration packets.
@@ -32,6 +34,9 @@ public final class ConfigPackets {
 
     /**
      * Register a client-to-server packet receiver.
+     * <p>
+     * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
+     * the operation on {@linkplain MinecraftServer#execute(Runnable) server thread}.
      *
      * @param id       the packet id
      * @param receiver the receiver
@@ -45,6 +50,8 @@ public final class ConfigPackets {
 
     /**
      * Register a client-to-server packet receiver.
+     * <p>
+     * Typed packet receiver is run on the main server thread.
      *
      * @param id       the {@linkplain CustomPacketPayload#id() packet id}
      * @param reader   the payload reader
@@ -71,6 +78,9 @@ public final class ConfigPackets {
 
     /**
      * Register a server-to-client packet receiver.
+     * <p>
+     * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
+     * the operation on {@linkplain Minecraft#execute(Runnable) client thread}.
      *
      * @param id       the packet id
      * @param receiver the receiver
@@ -86,6 +96,8 @@ public final class ConfigPackets {
 
     /**
      * Register a server-to-client packet receiver.
+     * <p>
+     * Typed packet receiver is run on the main client thread.
      *
      * @param id       the {@linkplain CustomPacketPayload#id() packet id}
      * @param reader   the payload reader

@@ -20,7 +20,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     private final ServerGamePacketListenerImpl handler;
 
     public ServerPlayPacketHandler(MinecraftServer server, ServerGamePacketListenerImpl handler, Connection connection) {
-        super("ServerPlayPacketHandler for " + handler.getPlayer().getScoreboardName(), ChannelRegistry.PLAY_C2S, ClientboundCustomPayloadPacket::new, connection);
+        super("ServerPlayPacketHandler for " + handler.getPlayer().getScoreboardName(), ChannelRegistry.PLAY_C2S, ClientboundCustomPayloadPacket::new, server, connection);
         this.server = server;
         this.handler = handler;
     }
@@ -42,7 +42,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     }
 
     @Override
-    protected void receive(ServerPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receiveUnsafe(ServerPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(server, handler.getPlayer(), handler, payload, this);
     }
 

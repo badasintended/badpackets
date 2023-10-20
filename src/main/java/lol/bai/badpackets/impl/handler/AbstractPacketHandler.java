@@ -1,6 +1,7 @@
 package lol.bai.badpackets.impl.handler;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -29,16 +31,18 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
     protected final Logger logger;
 
     private final Function<CustomPacketPayload, Packet<?>> packetFactory;
-    private final Set<ResourceLocation> sendableChannels = new HashSet<>();
+    private final Set<ResourceLocation> sendableChannels = Collections.synchronizedSet(new HashSet<>());
 
+    private final BlockableEventLoop<?> eventLoop;
     private final Connection connection;
 
     private boolean initialized = false;
 
-    protected AbstractPacketHandler(String desc, ChannelRegistry<T> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, Connection connection) {
+    protected AbstractPacketHandler(String desc, ChannelRegistry<T> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
         this.logger = LogManager.getLogger(desc);
         this.registry = registry;
         this.packetFactory = packetFactory;
+        this.eventLoop = eventLoop;
         this.connection = connection;
 
         registry.addHandler(this);
@@ -58,7 +62,8 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
                         sendableChannels.add(new ResourceLocation(namespace, path));
                     }
                 }
-                onInitialChannelSyncPacketReceived();
+
+                eventLoop.execute(this::onInitialChannelSyncPacketReceived);
             }
         }
     }
@@ -76,9 +81,15 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
             return true;
         }
 
-        if (registry.channels.containsKey(id)) {
+        if (registry.has(id)) {
             try {
-                receive(registry.channels.get(id), payload);
+                T receiver = registry.get(id);
+
+                if (payload instanceof UntypedPayload || eventLoop.isSameThread()) {
+                    receiveUnsafe(receiver, payload);
+                } else eventLoop.execute(() -> {
+                    if (connection.isConnected()) receiveUnsafe(receiver, payload);
+                });
             } catch (Throwable t) {
                 logger.error("Error when receiving packet {}", id, t);
                 throw t;
@@ -91,17 +102,18 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
 
     protected abstract void onInitialChannelSyncPacketReceived();
 
-    protected abstract void receive(T receiver, CustomPacketPayload payload);
+    protected abstract void receiveUnsafe(T receiver, CustomPacketPayload payload);
 
     public void sendInitialChannelSyncPacket() {
         if (!initialized) {
             initialized = true;
             sendVanillaChannelRegisterPacket(Set.of(Constants.CHANNEL_SYNC));
 
+            Set<ResourceLocation> channels = registry.getChannels();
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeByte(Constants.CHANNEL_SYNC_INITIAL);
 
-            Map<String, List<ResourceLocation>> group = registry.channels.keySet().stream().collect(Collectors.groupingBy(ResourceLocation::getNamespace));
+            Map<String, List<ResourceLocation>> group = channels.stream().collect(Collectors.groupingBy(ResourceLocation::getNamespace));
             buf.writeVarInt(group.size());
 
             for (Map.Entry<String, List<ResourceLocation>> entry : group.entrySet()) {
@@ -114,7 +126,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
             }
 
             send(Constants.CHANNEL_SYNC, buf);
-            sendVanillaChannelRegisterPacket(registry.channels.keySet());
+            sendVanillaChannelRegisterPacket(channels);
         }
     }
 

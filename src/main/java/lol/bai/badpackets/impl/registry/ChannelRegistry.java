@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -35,11 +37,12 @@ public class ChannelRegistry<T> {
     public static final ChannelRegistry<ClientPlayPacketReceiver<CustomPacketPayload>> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS, S2C_READERS);
     public static final ChannelRegistry<ServerPlayPacketReceiver<CustomPacketPayload>> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS, C2S_READERS);
 
-    public final Map<ResourceLocation, T> channels = new HashMap<>();
-
+    private final Map<ResourceLocation, T> channels = new HashMap<>();
     private final Set<ResourceLocation> reservedChannels;
     private final Set<AbstractPacketHandler<T>> handlers = new HashSet<>();
     private final ReaderMapHolder readersHolder;
+
+    private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
 
     private ChannelRegistry(Set<ResourceLocation> reservedChannels, ReaderMapHolder readersHolder) {
         this.reservedChannels = reservedChannels;
@@ -47,29 +50,83 @@ public class ChannelRegistry<T> {
     }
 
     public void register(ResourceLocation id, FriendlyByteBuf.Reader<? extends CustomPacketPayload> reader, T receiver) {
-        if (reservedChannels.contains(id)) {
-            throw new IllegalArgumentException("Reserved channel id " + id);
-        }
+        Lock lock = locks.writeLock();
+        lock.lock();
 
-        Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> readers = readersHolder.getter.get();
-        if (!(readers instanceof HashMap)) {
-            readers = new HashMap<>(readers);
-            readersHolder.setter.accept(readers);
-        }
+        try {
+            if (reservedChannels.contains(id)) {
+                throw new IllegalArgumentException("Reserved channel id " + id);
+            }
 
-        readers.put(id, reader);
-        channels.put(id, receiver);
-        for (AbstractPacketHandler<T> handler : handlers) {
-            handler.onRegister(id);
+            Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> readers = readersHolder.getter.get();
+            if (!(readers instanceof HashMap)) {
+                readers = new HashMap<>(readers);
+                readersHolder.setter.accept(readers);
+            }
+
+            readers.put(id, reader);
+            channels.put(id, receiver);
+            for (AbstractPacketHandler<T> handler : handlers) {
+                handler.onRegister(id);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean has(ResourceLocation id) {
+        Lock lock = locks.readLock();
+        lock.lock();
+
+        try {
+            return channels.containsKey(id);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public T get(ResourceLocation id) {
+        Lock lock = locks.readLock();
+        lock.lock();
+
+        try {
+            return channels.get(id);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public Set<ResourceLocation> getChannels() {
+        Lock lock = locks.readLock();
+        lock.lock();
+
+        try {
+            return new HashSet<>(channels.keySet());
+        } finally {
+            lock.unlock();
         }
     }
 
     public void addHandler(AbstractPacketHandler<T> handler) {
-        handlers.add(handler);
+        Lock lock = locks.writeLock();
+        lock.lock();
+
+        try {
+            handlers.add(handler);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeHandler(AbstractPacketHandler<T> handler) {
-        handlers.remove(handler);
+        Lock lock = locks.writeLock();
+        lock.lock();
+
+        try {
+            handlers.remove(handler);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private record ReaderMapHolder(

@@ -19,7 +19,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfi
     private final ClientConfigurationPacketListenerImpl listener;
 
     public ClientConfigPacketHandler(Minecraft client, ClientConfigurationPacketListenerImpl listener, Connection connection) {
-        super("ClientConfigPacketHandler", ChannelRegistry.CONFIG_S2C, ServerboundCustomPayloadPacket::new, connection);
+        super("ClientConfigPacketHandler", ChannelRegistry.CONFIG_S2C, ServerboundCustomPayloadPacket::new, client, connection);
 
         this.client = client;
         this.listener = listener;
@@ -40,7 +40,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfi
     }
 
     @Override
-    protected void receive(ClientConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receiveUnsafe(ClientConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(client, listener, payload, this);
     }
 
