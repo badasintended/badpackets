@@ -7,7 +7,7 @@ import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.configuration.ClientboundFinishConfigurationPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,11 +26,6 @@ public class MixinClientConfigurationPacketListenerImpl extends MixinClientCommo
         badpackets_packetHandler = new ClientConfigPacketHandler(minecraft, (ClientConfigurationPacketListenerImpl) (Object) this, connection);
     }
 
-    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void badpackets_receiveS2CPacket(CustomPacketPayload payload, CallbackInfo ci) {
-        if (badpackets_packetHandler.receive(payload)) ci.cancel();
-    }
-
     @Inject(method = "handleConfigurationFinished", at = @At("RETURN"))
     private void badpacekts_removePacketHandler(ClientboundFinishConfigurationPacket $$0, CallbackInfo ci) {
         badpackets_packetHandler.remove();
@@ -44,6 +39,11 @@ public class MixinClientConfigurationPacketListenerImpl extends MixinClientCommo
     @Override
     protected boolean badpackets_handlePing(int id) {
         return id == Constants.PING_PONG;
+    }
+
+    @Override
+    protected boolean badpackets_handleCustomPayload(ClientboundCustomPayloadPacket packet) {
+        return badpackets_packetHandler.receive(packet.payload());
     }
 
 }

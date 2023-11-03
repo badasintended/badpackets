@@ -6,7 +6,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundStartConfigurationPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,11 +30,6 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
         badpacket_packetHandler.remove();
     }
 
-    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void badpackets_receiveS2CPacket(CustomPacketPayload payload, CallbackInfo ci) {
-        if (badpacket_packetHandler.receive(payload)) ci.cancel();
-    }
-
     @Inject(method = "handleConfigurationStart", at = @At("RETURN"))
     private void badpackets_removeHandler(ClientboundStartConfigurationPacket $$0, CallbackInfo ci) {
         badpacket_packetHandler.remove();
@@ -43,6 +38,11 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
     @Override
     public ClientPlayPacketHandler badpackets_getHandler() {
         return badpacket_packetHandler;
+    }
+
+    @Override
+    protected boolean badpackets_handleCustomPayload(ClientboundCustomPayloadPacket packet) {
+        return badpacket_packetHandler.receive(packet.payload());
     }
 
 }

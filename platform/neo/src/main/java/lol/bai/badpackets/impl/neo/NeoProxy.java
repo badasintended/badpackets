@@ -1,4 +1,4 @@
-package lol.bai.badpackets.impl.forge;
+package lol.bai.badpackets.impl.neo;
 
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
@@ -6,28 +6,28 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.DiscardedPayload;
+import net.neoforged.neoforge.network.custom.payload.SimplePayload;
 
-public class ForgeProxy extends PlatformProxy {
+public class NeoProxy extends PlatformProxy {
 
     @Override
     public Packet<?> createVanillaRegisterConfigS2CPacket(FriendlyByteBuf buf) {
-        return new ClientboundCustomPayloadPacket(new DiscardedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+        return new ClientboundCustomPayloadPacket(SimplePayload.outbound(buf, 0, Constants.MC_REGISTER_CHANNEL));
     }
 
     @Override
     public Packet<?> createVanillaRegisterConfigC2SPacket(FriendlyByteBuf buf) {
-        return new ServerboundCustomPayloadPacket(new DiscardedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+        return new ServerboundCustomPayloadPacket(SimplePayload.outbound(buf, 0, Constants.MC_REGISTER_CHANNEL));
     }
 
     @Override
     public Packet<?> createVanillaRegisterPlayS2CPacket(FriendlyByteBuf buf) {
-        return new ClientboundCustomPayloadPacket(new DiscardedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+        return new ClientboundCustomPayloadPacket(SimplePayload.outbound(buf, 0, Constants.MC_REGISTER_CHANNEL));
     }
 
     @Override
     public Packet<?> createVanillaRegisterPlayC2SPacket(FriendlyByteBuf buf) {
-        return new ServerboundCustomPayloadPacket(new DiscardedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+        return new ServerboundCustomPayloadPacket(SimplePayload.outbound(buf, 0, Constants.MC_REGISTER_CHANNEL));
     }
 
 }

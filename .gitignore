@@ -4,6 +4,7 @@
 build/
 eclipse/
 run/
+runs/
 out/
 asm/
 bin/
