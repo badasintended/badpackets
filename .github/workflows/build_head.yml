@@ -32,5 +32,5 @@ jobs:
           GIT_HASH: ${{ steps.vars.outputs.git_hash }}
       - uses: actions/upload-artifact@v3
         with:
-          name: wthit-${{ steps.vars.outputs.git_hash }}
+          name: badpackets-${{ steps.vars.outputs.git_hash }}
           path: "./platform/*/build/libs/**.jar"
