@@ -8,8 +8,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BadPacketTest {
 
@@ -21,7 +21,7 @@ public class BadPacketTest {
     public static final ResourceLocation PLAY_C2S = Constants.id("test/play/c2s");
     public static final ResourceLocation PLAY_S2C = Constants.id("test/play/s2c");
 
-    public static final Logger LOGGER = LogManager.getLogger(BadPacketTest.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(BadPacketTest.class);
 
     public static void server() {
         // TASK --------------------------------------------------------------------------------------------------------

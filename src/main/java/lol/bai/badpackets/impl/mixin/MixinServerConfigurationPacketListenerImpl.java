@@ -3,9 +3,10 @@ package lol.bai.badpackets.impl.mixin;
 import java.util.Queue;
 
 import lol.bai.badpackets.impl.Constants;
+import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
 import lol.bai.badpackets.impl.handler.ServerConfigPacketHandler;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.configuration.ServerboundFinishConfigurationPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -23,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerConfigurationPacketListenerImpl.class)
-public abstract class MixinServerConfigurationPacketListenerImpl extends MixinServerCommonPacketListenerImpl implements ServerConfigPacketHandler.TaskFinisher {
+public abstract class MixinServerConfigurationPacketListenerImpl extends MixinServerCommonPacketListenerImpl implements ServerConfigPacketHandler.TaskFinisher, AbstractPacketHandler.Holder {
 
     @Shadow
     @Final
@@ -75,8 +76,8 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
     }
 
     @Override
-    protected boolean badpackets_handleCustomPayload(ServerboundCustomPayloadPacket packet) {
-        return badpackets_packetHandler.receive(packet.payload());
+    public boolean badpackets_receive(CustomPacketPayload payload) {
+        return badpackets_packetHandler.receive(payload);
     }
 
     @Override

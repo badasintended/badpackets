@@ -46,7 +46,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
         receiver.receive(server, handler.getPlayer(), handler, payload, this);
     }
 
-    public interface Holder {
+    public interface Holder extends AbstractPacketHandler.Holder {
 
         ServerPlayPacketHandler badpackets_getHandler();
 

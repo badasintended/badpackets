@@ -2,7 +2,6 @@ package lol.bai.badpackets.impl.mixin.client;
 
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,22 +22,12 @@ public abstract class MixinClientCommonPacketListenerImpl {
         if (badpackets_handlePing(packet.getId())) ci.cancel();
     }
 
-    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true)
-    private void badpackets_handleCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
-        if (badpackets_handleCustomPayload(packet)) ci.cancel();
-    }
-
     @Unique
     protected void badpackets_removeClientPacketHandler(Component reason) {
     }
 
     @Unique
     protected boolean badpackets_handlePing(int id) {
-        return false;
-    }
-
-    @Unique
-    protected boolean badpackets_handleCustomPayload(ClientboundCustomPayloadPacket packet) {
         return false;
     }
 

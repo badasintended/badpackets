@@ -3,7 +3,7 @@ package lol.bai.badpackets.impl.mixin;
 import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerboundConfigurationAcknowledgedPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,8 +37,8 @@ public class MixinServerGamePacketListenerImpl extends MixinServerCommonPacketLi
     }
 
     @Override
-    protected boolean badpackets_handleCustomPayload(ServerboundCustomPayloadPacket packet) {
-        return badpacket_packetHandler.receive(packet.payload());
+    public boolean badpackets_receive(CustomPacketPayload payload) {
+        return badpacket_packetHandler.receive(payload);
     }
 
     @Override

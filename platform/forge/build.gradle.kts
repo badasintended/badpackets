@@ -70,3 +70,9 @@ afterEvaluate {
         maven(jar, sourcesJar)
     }
 }
+
+sourceSets.forEach {
+    val dir = layout.buildDirectory.dir("sourcesSets/${it.name}")
+    it.output.setResourcesDir(dir)
+    it.java.destinationDirectory.set(dir)
+}
