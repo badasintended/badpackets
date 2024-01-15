@@ -21,12 +21,17 @@ public record UntypedPayload(
 
     @Override
     public void write(@NotNull FriendlyByteBuf buf) {
-        buf.writeBytes(buffer);
+        buf.writeBytes(buffer.copy());
     }
 
     @Override
     public @NotNull ResourceLocation id() {
         return channelId;
+    }
+
+    @Override
+    public FriendlyByteBuf buffer() {
+        return new FriendlyByteBuf(buffer.copy());
     }
 
 }
