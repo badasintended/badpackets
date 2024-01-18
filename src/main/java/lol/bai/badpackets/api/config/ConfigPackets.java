@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -44,7 +45,7 @@ public final class ConfigPackets {
      * @see ServerConfigPacketReceiver#receive
      */
     public static void registerServerReceiver(ResourceLocation id, ServerConfigPacketReceiver<FriendlyByteBuf> receiver) {
-        registerServerReceiver(id, UntypedPayload.reader(id), (server, handler, payload, responseSender, taskFinisher) ->
+        registerServerReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (server, handler, payload, responseSender, taskFinisher) ->
             receiver.receive(server, handler, payload.buffer(), responseSender, taskFinisher));
     }
 
@@ -53,15 +54,15 @@ public final class ConfigPackets {
      * <p>
      * Typed packet receiver is run on the main server thread.
      *
-     * @param id       the {@linkplain CustomPacketPayload#id() packet id}
-     * @param reader   the payload reader
+     * @param type     the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec    the payload codec
      * @param receiver the receiver
      *
      * @see ServerConfigPacketReceiver#receive
      */
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerServerReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ServerConfigPacketReceiver<P> receiver) {
-        ChannelRegistry.CONFIG_C2S.register(id, reader, (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerServerReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec, ServerConfigPacketReceiver<P> receiver) {
+        ChannelRegistry.CONFIG_C2S.register(type, codec, (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
@@ -90,7 +91,7 @@ public final class ConfigPackets {
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientConfigPacketReceiver<FriendlyByteBuf> receiver) {
-        registerClientReceiver(id, UntypedPayload.reader(id), (client, handler, payload, responseSender) ->
+        registerClientReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (client, handler, payload, responseSender) ->
             receiver.receive(client, handler, payload.buffer(), responseSender));
     }
 
@@ -99,8 +100,8 @@ public final class ConfigPackets {
      * <p>
      * Typed packet receiver is run on the main client thread.
      *
-     * @param id       the {@linkplain CustomPacketPayload#id() packet id}
-     * @param reader   the payload reader
+     * @param type     the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec    the payload codec
      * @param receiver the receiver
      *
      * @see ClientConfigPacketReceiver#receive
@@ -108,8 +109,8 @@ public final class ConfigPackets {
      */
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerClientReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ClientConfigPacketReceiver<P> receiver) {
-        ChannelRegistry.CONFIG_S2C.register(id, reader, (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec, ClientConfigPacketReceiver<P> receiver) {
+        ChannelRegistry.CONFIG_S2C.register(type, codec, (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**

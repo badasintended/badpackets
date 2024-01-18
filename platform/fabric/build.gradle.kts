@@ -9,7 +9,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
 
     modImplementation("net.fabricmc:fabric-loader:${rootProp["fabricLoader"]}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
+//    modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
 }
 
 loom {

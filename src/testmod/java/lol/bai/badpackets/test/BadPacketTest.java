@@ -27,7 +27,7 @@ public class BadPacketTest {
         // TASK --------------------------------------------------------------------------------------------------------
 
         ConfigPackets.registerTask(CONFIG_TASK, (handler, sender, server) -> {
-            if (sender.canSend(TestTaskPayload.ID)) {
+            if (sender.canSend(TestTaskPayload.TYPE)) {
                 sender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_1));
                 return true;
             }
@@ -35,7 +35,7 @@ public class BadPacketTest {
             return false;
         });
 
-        ConfigPackets.registerServerReceiver(TestTaskPayload.ID, TestTaskPayload::new, (server, handler, payload, responseSender, taskFinisher) -> {
+        ConfigPackets.registerServerReceiver(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) -> {
             LOGGER.info("[config task] client -> server " + payload.stage().name());
 
             switch (payload.stage()) {
@@ -51,12 +51,12 @@ public class BadPacketTest {
         ConfigPackets.registerServerReceiver(CONFIG_C2S, (server, handler, buf, responseSender, taskFinisher) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerServerReceiver(TestConfigPayload.ID, TestConfigPayload::new, (server, handler, payload, responseSender, taskFinisher) ->
+        ConfigPackets.registerServerReceiver(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerServerReadyCallback((handler, sender, server) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.CONFIG_S2C));
-            Validate.isTrue(sender.canSend(TestConfigPayload.ID));
+            Validate.isTrue(sender.canSend(TestConfigPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[config untyped] server -> client");
@@ -70,12 +70,12 @@ public class BadPacketTest {
         PlayPackets.registerServerReceiver(PLAY_C2S, (server, player, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerServerReceiver(TestPlayPayload.ID, TestPlayPayload::new, (server, player, handler, payload, responseSender) ->
+        PlayPackets.registerServerReceiver(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (server, player, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         PlayPackets.registerServerReadyCallback((handler, sender, server) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.PLAY_S2C));
-            Validate.isTrue(sender.canSend(TestPlayPayload.ID));
+            Validate.isTrue(sender.canSend(TestPlayPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[play untyped] server -> client");
@@ -88,7 +88,7 @@ public class BadPacketTest {
     public static void client() {
         // TASK --------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerClientReceiver(TestTaskPayload.ID, TestTaskPayload::new, (client, handler, payload, responseSender) -> {
+        ConfigPackets.registerClientReceiver(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (client, handler, payload, responseSender) -> {
             LOGGER.info("[config task] server -> client " + payload.stage().name());
 
             switch (payload.stage()) {
@@ -104,12 +104,12 @@ public class BadPacketTest {
         ConfigPackets.registerClientReceiver(CONFIG_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerClientReceiver(TestConfigPayload.ID, TestConfigPayload::new, (client, handler, payload, responseSender) ->
+        ConfigPackets.registerClientReceiver(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (client, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerClientReadyCallback((handler, sender, client) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.CONFIG_C2S));
-            Validate.isTrue(sender.canSend(TestConfigPayload.ID));
+            Validate.isTrue(sender.canSend(TestConfigPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[config untyped] client -> server");
@@ -123,12 +123,12 @@ public class BadPacketTest {
         PlayPackets.registerClientReceiver(PLAY_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerClientReceiver(TestPlayPayload.ID, TestPlayPayload::new, (client, handler, payload, responseSender) ->
+        PlayPackets.registerClientReceiver(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (client, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         PlayPackets.registerClientReadyCallback((handler, sender, client) -> {
             Validate.isTrue(sender.canSend(BadPacketTest.PLAY_C2S));
-            Validate.isTrue(sender.canSend(TestPlayPayload.ID));
+            Validate.isTrue(sender.canSend(TestPlayPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[play untyped] client -> server");

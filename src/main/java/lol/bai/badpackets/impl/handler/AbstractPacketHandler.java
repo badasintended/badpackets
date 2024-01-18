@@ -26,9 +26,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractPacketHandler<T> implements PacketSender {
+public abstract class AbstractPacketHandler<R> implements PacketSender {
 
-    protected final ChannelRegistry<T> registry;
+    protected final ChannelRegistry<?, R> registry;
     protected final Logger logger;
 
     private final Function<CustomPacketPayload, Packet<?>> packetFactory;
@@ -39,7 +39,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
 
     private boolean initialized = false;
 
-    protected AbstractPacketHandler(String desc, ChannelRegistry<T> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
+    protected AbstractPacketHandler(String desc, ChannelRegistry<?, R> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
         this.logger = LogManager.getLogger(desc);
         this.registry = registry;
         this.packetFactory = packetFactory;
@@ -69,12 +69,8 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
         }
     }
 
-    public static void addChannelSyncReader(Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> map) {
-        map.put(Constants.CHANNEL_SYNC, UntypedPayload.reader(Constants.CHANNEL_SYNC));
-    }
-
     public boolean receive(CustomPacketPayload payload) {
-        ResourceLocation id = payload.id();
+        ResourceLocation id = payload.type().id();
 
         if (id.equals(Constants.CHANNEL_SYNC)) {
             UntypedPayload untyped = (UntypedPayload) payload;
@@ -84,7 +80,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
 
         if (registry.has(id)) {
             try {
-                T receiver = registry.get(id);
+                R receiver = registry.get(id);
 
                 if (payload instanceof UntypedPayload || eventLoop.isSameThread()) {
                     receiveUnsafe(receiver, payload);
@@ -103,7 +99,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
 
     protected abstract void onInitialChannelSyncPacketReceived();
 
-    protected abstract void receiveUnsafe(T receiver, CustomPacketPayload payload);
+    protected abstract void receiveUnsafe(R receiver, CustomPacketPayload payload);
 
     public void sendInitialChannelSyncPacket() {
         if (!initialized) {

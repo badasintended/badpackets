@@ -7,6 +7,8 @@ import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +28,7 @@ public final class PlayPackets {
      * @param receiver the receiver
      */
     public static void registerServerReceiver(ResourceLocation id, ServerPlayPacketReceiver<FriendlyByteBuf> receiver) {
-        registerServerReceiver(id, UntypedPayload.reader(id), (server, player, handler, payload, responseSender) ->
+        registerServerReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (server, player, handler, payload, responseSender) ->
             receiver.receive(server, player, handler, payload.buffer(), responseSender));
     }
 
@@ -35,13 +37,13 @@ public final class PlayPackets {
      * <p>
      * Typed packet receiver is run on the main server thread.
      *
-     * @param id       the {@linkplain CustomPacketPayload#id() packet id}
-     * @param reader   the payload reader
+     * @param type     the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec    the payload codec
      * @param receiver the receiver
      */
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerServerReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ServerPlayPacketReceiver<P> receiver) {
-        ChannelRegistry.PLAY_C2S.register(id, reader, (ServerPlayPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerServerReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super RegistryFriendlyByteBuf, P> codec, ServerPlayPacketReceiver<P> receiver) {
+        ChannelRegistry.PLAY_C2S.register(type, codec, (ServerPlayPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
@@ -66,7 +68,7 @@ public final class PlayPackets {
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientPlayPacketReceiver<FriendlyByteBuf> receiver) {
-        registerClientReceiver(id, UntypedPayload.reader(id), (client, handler, payload, responseSender) ->
+        registerClientReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (client, handler, payload, responseSender) ->
             receiver.receive(client, handler, payload.buffer(), responseSender));
     }
 
@@ -75,14 +77,14 @@ public final class PlayPackets {
      * <p>
      * Typed packet receiver is run on the main client thread.
      *
-     * @param id       the {@linkplain CustomPacketPayload#id() packet id}
-     * @param reader   the payload reader
+     * @param type     the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec    the payload codec
      * @param receiver the receiver
      */
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerClientReceiver(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, ClientPlayPacketReceiver<P> receiver) {
-        ChannelRegistry.PLAY_S2C.register(id, reader, (ClientPlayPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super RegistryFriendlyByteBuf, P> codec, ClientPlayPacketReceiver<P> receiver) {
+        ChannelRegistry.PLAY_S2C.register(type, codec, (ClientPlayPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**

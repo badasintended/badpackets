@@ -11,6 +11,7 @@ import lol.bai.badpackets.impl.marker.ApiSide;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +27,7 @@ public interface PacketSender {
      * <b>Only available when on game.</b>
      *
      * @see PlayPackets#registerServerReceiver(ResourceLocation, ServerPlayPacketReceiver)
-     * @see PlayPackets#registerServerReceiver(ResourceLocation, FriendlyByteBuf.Reader, ServerPlayPacketReceiver)
+     * @see PlayPackets#registerServerReceiver(CustomPacketPayload.Type, StreamCodec, ServerPlayPacketReceiver)
      */
     @ApiSide.ClientOnly
     static PacketSender c2s() {
@@ -39,7 +40,7 @@ public interface PacketSender {
      * @param player the player that we want to send packets to.
      *
      * @see PlayPackets#registerClientReceiver(ResourceLocation, ClientPlayPacketReceiver)
-     * @see PlayPackets#registerClientReceiver(ResourceLocation, FriendlyByteBuf.Reader, ClientPlayPacketReceiver)
+     * @see PlayPackets#registerClientReceiver(CustomPacketPayload.Type, StreamCodec, ClientPlayPacketReceiver)
      */
     @ApiSide.ServerOnly
     static PacketSender s2c(ServerPlayer player) {
@@ -55,6 +56,18 @@ public interface PacketSender {
      * @see PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)
      */
     boolean canSend(ResourceLocation id);
+
+    /**
+     * Returns whether the target can receive a packet with the specified id.
+     * <p>
+     * <b>Note:</b> Only works for Bad Packets channels.
+     *
+     * @see PlayPackets#registerClientReadyCallback(ClientPlayPacketReadyCallback)
+     * @see PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)
+     */
+    default boolean canSend(CustomPacketPayload.Type<?> type) {
+        return canSend(type.id());
+    }
 
     /**
      * Send a packet to the target.
@@ -83,7 +96,7 @@ public interface PacketSender {
      * @param callback a callback in which will be called after the packet sent to the target.
      */
     default void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable PacketSendListener callback) {
-        send(new UntypedPayload(id, buf), callback);
+        send(new UntypedPayload(UntypedPayload.type(id), buf), callback);
     }
 
 }
