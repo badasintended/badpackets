@@ -36,7 +36,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
     private final Set<ResourceLocation> reservedChannels;
 
     private final Map<ResourceLocation, StreamCodec<?, ?>> codecs = new HashMap<>();
-    private final Map<ResourceLocation, R> channels = new HashMap<>();
+    private final Map<ResourceLocation, R> receivers = new HashMap<>();
     private final Set<AbstractPacketHandler<R>> handlers = new HashSet<>();
 
     private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
@@ -47,19 +47,33 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         codecs.put(Constants.CHANNEL_SYNC, UntypedPayload.codec(Constants.CHANNEL_SYNC));
     }
 
-    public <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<? super B, P> codec, R receiver) {
+    public <P extends CustomPacketPayload> void registerCodec(ResourceLocation id, StreamCodec<? super B, P> codec) {
         Lock lock = locks.writeLock();
         lock.lock();
 
         try {
-            if (reservedChannels.contains(type.id())) {
-                throw new IllegalArgumentException("Reserved channel id " + type.id());
+            if (reservedChannels.contains(id)) {
+                throw new IllegalArgumentException("Reserved channel id " + id);
             }
 
-            codecs.put(type.id(), codec);
-            channels.put(type.id(), receiver);
+            codecs.put(id, codec);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void registerReceiver(ResourceLocation id, R receiver) {
+        Lock lock = locks.writeLock();
+        lock.lock();
+
+        try {
+            if (!codecs.containsKey(id)) {
+                throw new IllegalArgumentException("Unknown channel id " + id);
+            }
+
+            receivers.put(id, receiver);
             for (AbstractPacketHandler<R> handler : handlers) {
-                handler.onRegister(type.id());
+                handler.onRegister(id);
             }
         } finally {
             lock.unlock();
@@ -71,7 +85,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         lock.lock();
 
         try {
-            return channels.containsKey(id);
+            return receivers.containsKey(id);
         } finally {
             lock.unlock();
         }
@@ -82,7 +96,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         lock.lock();
 
         try {
-            return channels.get(id);
+            return receivers.get(id);
         } finally {
             lock.unlock();
         }
@@ -105,7 +119,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         lock.lock();
 
         try {
-            return new HashSet<>(channels.keySet());
+            return new HashSet<>(receivers.keySet());
         } finally {
             lock.unlock();
         }

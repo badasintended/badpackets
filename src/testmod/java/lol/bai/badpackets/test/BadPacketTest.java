@@ -35,7 +35,7 @@ public class BadPacketTest {
             return false;
         });
 
-        ConfigPackets.registerServerReceiver(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) -> {
+        ConfigPackets.registerServerChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) -> {
             LOGGER.info("[config task] client -> server " + payload.stage().name());
 
             switch (payload.stage()) {
@@ -46,12 +46,14 @@ public class BadPacketTest {
             }
         });
 
+        ConfigPackets.registerClientChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC);
+
         // CONFIG ------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerServerReceiver(CONFIG_C2S, (server, handler, buf, responseSender, taskFinisher) ->
+        ConfigPackets.registerServerChannel(CONFIG_C2S, (server, handler, buf, responseSender, taskFinisher) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerServerReceiver(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) ->
+        ConfigPackets.registerServerChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerServerReadyCallback((handler, sender, server) -> {
@@ -65,12 +67,15 @@ public class BadPacketTest {
             sender.send(new TestConfigPayload("[config typed] server -> client"));
         });
 
+        ConfigPackets.registerClientChannel(CONFIG_S2C);
+        ConfigPackets.registerClientChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC);
+
         // PLAY --------------------------------------------------------------------------------------------------------
 
-        PlayPackets.registerServerReceiver(PLAY_C2S, (server, player, handler, buf, responseSender) ->
+        PlayPackets.registerServerChannel(PLAY_C2S, (server, player, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerServerReceiver(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (server, player, handler, payload, responseSender) ->
+        PlayPackets.registerServerChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (server, player, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         PlayPackets.registerServerReadyCallback((handler, sender, server) -> {
@@ -83,12 +88,15 @@ public class BadPacketTest {
 
             sender.send(new TestPlayPayload("[play typed] server -> client"));
         });
+
+        PlayPackets.registerClientChannel(PLAY_S2C);
+        PlayPackets.registerClientChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC);
     }
 
     public static void client() {
         // TASK --------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerClientReceiver(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (client, handler, payload, responseSender) -> {
+        ConfigPackets.registerClientReceiver(TestTaskPayload.TYPE, (client, handler, payload, responseSender) -> {
             LOGGER.info("[config task] server -> client " + payload.stage().name());
 
             switch (payload.stage()) {
@@ -104,7 +112,7 @@ public class BadPacketTest {
         ConfigPackets.registerClientReceiver(CONFIG_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerClientReceiver(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (client, handler, payload, responseSender) ->
+        ConfigPackets.registerClientReceiver(TestConfigPayload.TYPE, (client, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerClientReadyCallback((handler, sender, client) -> {
@@ -123,7 +131,7 @@ public class BadPacketTest {
         PlayPackets.registerClientReceiver(PLAY_S2C, (client, handler, buf, responseSender) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerClientReceiver(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (client, handler, payload, responseSender) ->
+        PlayPackets.registerClientReceiver(TestPlayPayload.TYPE, (client, handler, payload, responseSender) ->
             LOGGER.info(payload.msg()));
 
         PlayPackets.registerClientReadyCallback((handler, sender, client) -> {

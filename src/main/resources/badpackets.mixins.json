@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_16",
   "refmap"            : "badpackets.refmap.json",
   "mixins"            : [
+    "MixinClientboundCustomPayloadPacket",
     "MixinPlayerList",
     "MixinServerboundCustomPayloadPacket",
     "MixinServerCommonPacketListenerImpl",
@@ -13,7 +14,6 @@
   ],
   "client"            : [
     "client.AccessClientCommonPacketListenerImpl",
-    "client.MixinClientboundCustomPayloadPacket",
     "client.MixinClientCommonPacketListenerImpl",
     "client.MixinClientConfigurationPacketListenerImpl",
     "client.MixinClientPacketListener"

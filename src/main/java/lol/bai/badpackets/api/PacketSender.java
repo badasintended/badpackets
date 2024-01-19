@@ -26,8 +26,8 @@ public interface PacketSender {
      * <p>
      * <b>Only available when on game.</b>
      *
-     * @see PlayPackets#registerServerReceiver(ResourceLocation, ServerPlayPacketReceiver)
-     * @see PlayPackets#registerServerReceiver(CustomPacketPayload.Type, StreamCodec, ServerPlayPacketReceiver)
+     * @see PlayPackets#registerServerChannel(ResourceLocation, ServerPlayPacketReceiver)
+     * @see PlayPackets#registerServerChannel(CustomPacketPayload.Type, StreamCodec, ServerPlayPacketReceiver)
      */
     @ApiSide.ClientOnly
     static PacketSender c2s() {
@@ -39,8 +39,8 @@ public interface PacketSender {
      *
      * @param player the player that we want to send packets to.
      *
-     * @see PlayPackets#registerClientReceiver(ResourceLocation, ClientPlayPacketReceiver)
-     * @see PlayPackets#registerClientReceiver(CustomPacketPayload.Type, StreamCodec, ClientPlayPacketReceiver)
+     * @see PlayPackets#registerClientChannel(ResourceLocation, ClientPlayPacketReceiver)
+     * @see PlayPackets#registerClientChannel(CustomPacketPayload.Type, StreamCodec, ClientPlayPacketReceiver)
      */
     @ApiSide.ServerOnly
     static PacketSender s2c(ServerPlayer player) {

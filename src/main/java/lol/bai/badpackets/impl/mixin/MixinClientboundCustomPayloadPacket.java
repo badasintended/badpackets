@@ -1,4 +1,4 @@
-package lol.bai.badpackets.impl.mixin.client;
+package lol.bai.badpackets.impl.mixin;
 
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;

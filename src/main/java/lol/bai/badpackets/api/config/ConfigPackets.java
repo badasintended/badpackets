@@ -44,9 +44,9 @@ public final class ConfigPackets {
      *
      * @see ServerConfigPacketReceiver#receive
      */
-    public static void registerServerReceiver(ResourceLocation id, ServerConfigPacketReceiver<FriendlyByteBuf> receiver) {
-        registerServerReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (server, handler, payload, responseSender, taskFinisher) ->
-            receiver.receive(server, handler, payload.buffer(), responseSender, taskFinisher));
+    public static void registerServerChannel(ResourceLocation id, ServerConfigPacketReceiver<FriendlyByteBuf> receiver) {
+        ChannelRegistry.CONFIG_C2S.registerCodec(id, UntypedPayload.codec(id));
+        ChannelRegistry.CONFIG_C2S.registerReceiver(id, (server, handler, payload, responseSender, taskFinisher) -> receiver.receive(server, handler, ((UntypedPayload) payload).buffer(), responseSender, taskFinisher));
     }
 
     /**
@@ -61,8 +61,9 @@ public final class ConfigPackets {
      * @see ServerConfigPacketReceiver#receive
      */
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerServerReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec, ServerConfigPacketReceiver<P> receiver) {
-        ChannelRegistry.CONFIG_C2S.register(type, codec, (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerServerChannel(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec, ServerConfigPacketReceiver<P> receiver) {
+        ChannelRegistry.CONFIG_C2S.registerCodec(type.id(), codec);
+        ChannelRegistry.CONFIG_C2S.registerReceiver(type.id(), (ServerConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
@@ -80,6 +81,35 @@ public final class ConfigPackets {
     /**
      * Register a server-to-client packet receiver.
      * <p>
+     * This method needs to be called on <b>all sides</b>.
+     * <p>
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(ResourceLocation, ClientConfigPacketReceiver)}
+     *
+     * @param id the packet id
+     */
+    public static void registerClientChannel(ResourceLocation id) {
+        ChannelRegistry.CONFIG_S2C.registerCodec(id, UntypedPayload.codec(id));
+    }
+
+    /**
+     * Register a server-to-client packet receiver.
+     * <p>
+     * This method needs to be called on <b>all sides</b>.
+     * <p>
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(CustomPacketPayload.Type, ClientConfigPacketReceiver)}
+     *
+     * @param type  the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec the payload codec
+     */
+    public static <P extends CustomPacketPayload> void registerClientChannel(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec) {
+        ChannelRegistry.CONFIG_S2C.registerCodec(type.id(), codec);
+    }
+
+    /**
+     * Register a server-to-client packet receiver.
+     * <p>
+     * The channel needs to be {@linkplain #registerClientChannel(ResourceLocation) registered} first.
+     * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain Minecraft#execute(Runnable) client thread}.
      *
@@ -91,17 +121,17 @@ public final class ConfigPackets {
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientConfigPacketReceiver<FriendlyByteBuf> receiver) {
-        registerClientReceiver(UntypedPayload.type(id), UntypedPayload.codec(id), (client, handler, payload, responseSender) ->
-            receiver.receive(client, handler, payload.buffer(), responseSender));
+        ChannelRegistry.CONFIG_S2C.registerReceiver(id, (client, handler, payload, responseSender) -> receiver.receive(client, handler, ((UntypedPayload) payload).buffer(), responseSender));
     }
 
     /**
      * Register a server-to-client packet receiver.
      * <p>
+     * The channel needs to be {@linkplain #registerClientChannel(CustomPacketPayload.Type, StreamCodec) registered} first.
+     * <p>
      * Typed packet receiver is run on the main client thread.
      *
      * @param type     the {@linkplain CustomPacketPayload#type() packet type}
-     * @param codec    the payload codec
      * @param receiver the receiver
      *
      * @see ClientConfigPacketReceiver#receive
@@ -109,8 +139,8 @@ public final class ConfigPackets {
      */
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, StreamCodec<? super FriendlyByteBuf, P> codec, ClientConfigPacketReceiver<P> receiver) {
-        ChannelRegistry.CONFIG_S2C.register(type, codec, (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, ClientConfigPacketReceiver<P> receiver) {
+        ChannelRegistry.CONFIG_S2C.registerReceiver(type.id(), (ClientConfigPacketReceiver<CustomPacketPayload>) receiver);
     }
 
     /**
