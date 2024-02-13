@@ -13,6 +13,7 @@ import io.netty.buffer.Unpooled;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
+import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -143,7 +144,7 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
     }
 
     private void sendVanillaChannelRegisterPacket(Set<ResourceLocation> channels) {
-        if (!channels.isEmpty()) {
+        if (PlatformProxy.INSTANCE.canSendVanillaRegisterPackets() && !channels.isEmpty()) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             boolean first = true;
             for (ResourceLocation channel : channels) {

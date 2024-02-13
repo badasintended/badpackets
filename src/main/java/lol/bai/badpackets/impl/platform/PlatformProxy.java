@@ -13,6 +13,10 @@ public class PlatformProxy {
 
     public static final PlatformProxy INSTANCE = ServiceLoader.load(PlatformProxy.class).findFirst().orElseGet(PlatformProxy::new);
 
+    public boolean canSendVanillaRegisterPackets() {
+        return true;
+    }
+
     public Packet<?> createVanillaRegisterConfigC2SPacket(FriendlyByteBuf buf) {
         return new ServerboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf));
     }

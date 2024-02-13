@@ -13,6 +13,12 @@ import net.minecraft.network.protocol.Packet;
 public class FabricProxy extends PlatformProxy {
 
     private static final boolean HAS_FABRIC_API = FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1");
+    private static final boolean HAS_QUILT_STD = FabricLoader.getInstance().isModLoaded("quilt_networking");
+
+    @Override
+    public boolean canSendVanillaRegisterPackets() {
+        return !HAS_QUILT_STD;
+    }
 
     @Override
     public Packet<?> createVanillaRegisterConfigS2CPacket(FriendlyByteBuf buf) {
