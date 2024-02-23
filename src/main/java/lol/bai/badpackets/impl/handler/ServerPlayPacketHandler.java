@@ -1,5 +1,8 @@
 package lol.bai.badpackets.impl.handler;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
@@ -10,6 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -30,8 +34,8 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(FriendlyByteBuf buf) {
-        return PlatformProxy.INSTANCE.createVanillaRegisterPlayS2CPacket(buf);
+    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return PlatformProxy.INSTANCE.createVanillaRegisterPlayS2CPacket(channels, buf);
     }
 
     @Override

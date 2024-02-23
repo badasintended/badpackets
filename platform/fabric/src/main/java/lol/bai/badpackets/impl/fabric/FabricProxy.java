@@ -1,5 +1,8 @@
 package lol.bai.badpackets.impl.fabric;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
@@ -9,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceLocation;
 
 public class FabricProxy extends PlatformProxy {
 
@@ -21,31 +25,31 @@ public class FabricProxy extends PlatformProxy {
     }
 
     @Override
-    public Packet<?> createVanillaRegisterConfigS2CPacket(FriendlyByteBuf buf) {
+    public Packet<?> createVanillaRegisterConfigS2CPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
         return HAS_FABRIC_API
-            ? ServerConfigurationNetworking.createS2CPacket(Constants.MC_REGISTER_CHANNEL, buf)
-            : super.createVanillaRegisterConfigS2CPacket(buf);
+            ? ServerConfigurationNetworking.createS2CPacket(Constants.MC_REGISTER_CHANNEL, buf.get())
+            : super.createVanillaRegisterConfigS2CPacket(channels, buf);
     }
 
     @Override
-    public Packet<?> createVanillaRegisterConfigC2SPacket(FriendlyByteBuf buf) {
+    public Packet<?> createVanillaRegisterConfigC2SPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
         return HAS_FABRIC_API
-            ? ClientConfigurationNetworking.createC2SPacket(Constants.MC_REGISTER_CHANNEL, buf)
-            : super.createVanillaRegisterConfigC2SPacket(buf);
+            ? ClientConfigurationNetworking.createC2SPacket(Constants.MC_REGISTER_CHANNEL, buf.get())
+            : super.createVanillaRegisterConfigC2SPacket(channels, buf);
     }
 
     @Override
-    public Packet<?> createVanillaRegisterPlayS2CPacket(FriendlyByteBuf buf) {
+    public Packet<?> createVanillaRegisterPlayS2CPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
         return HAS_FABRIC_API
-            ? ServerPlayNetworking.createS2CPacket(Constants.MC_REGISTER_CHANNEL, buf)
-            : super.createVanillaRegisterPlayS2CPacket(buf);
+            ? ServerPlayNetworking.createS2CPacket(Constants.MC_REGISTER_CHANNEL, buf.get())
+            : super.createVanillaRegisterPlayS2CPacket(channels, buf);
     }
 
     @Override
-    public Packet<?> createVanillaRegisterPlayC2SPacket(FriendlyByteBuf buf) {
+    public Packet<?> createVanillaRegisterPlayC2SPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
         return HAS_FABRIC_API
-            ? ClientPlayNetworking.createC2SPacket(Constants.MC_REGISTER_CHANNEL, buf)
-            : super.createVanillaRegisterPlayC2SPacket(buf);
+            ? ClientPlayNetworking.createC2SPacket(Constants.MC_REGISTER_CHANNEL, buf.get())
+            : super.createVanillaRegisterPlayC2SPacket(channels, buf);
     }
 
 }

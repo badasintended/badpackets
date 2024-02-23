@@ -1,6 +1,8 @@
 package lol.bai.badpackets.impl.platform;
 
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
@@ -8,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.resources.ResourceLocation;
 
 public class PlatformProxy {
 
@@ -17,20 +20,20 @@ public class PlatformProxy {
         return true;
     }
 
-    public Packet<?> createVanillaRegisterConfigC2SPacket(FriendlyByteBuf buf) {
-        return new ServerboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+    public Packet<?> createVanillaRegisterConfigC2SPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return new ServerboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf.get()));
     }
 
-    public Packet<?> createVanillaRegisterConfigS2CPacket(FriendlyByteBuf buf) {
-        return new ClientboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+    public Packet<?> createVanillaRegisterConfigS2CPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return new ClientboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf.get()));
     }
 
-    public Packet<?> createVanillaRegisterPlayC2SPacket(FriendlyByteBuf buf) {
-        return new ServerboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+    public Packet<?> createVanillaRegisterPlayC2SPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return new ServerboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf.get()));
     }
 
-    public Packet<?> createVanillaRegisterPlayS2CPacket(FriendlyByteBuf buf) {
-        return new ClientboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf));
+    public Packet<?> createVanillaRegisterPlayS2CPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return new ClientboundCustomPayloadPacket(new UntypedPayload(Constants.MC_REGISTER_CHANNEL, buf.get()));
     }
 
 }

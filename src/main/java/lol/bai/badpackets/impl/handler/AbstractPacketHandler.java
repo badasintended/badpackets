@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.netty.buffer.Unpooled;
@@ -145,21 +146,23 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
 
     private void sendVanillaChannelRegisterPacket(Set<ResourceLocation> channels) {
         if (PlatformProxy.INSTANCE.canSendVanillaRegisterPackets() && !channels.isEmpty()) {
-            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            boolean first = true;
-            for (ResourceLocation channel : channels) {
-                if (first) {
-                    first = false;
-                } else {
-                    buf.writeByte(0);
+            connection.send(createVanillaRegisterPacket(channels, () -> {
+                FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+                boolean first = true;
+                for (ResourceLocation channel : channels) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        buf.writeByte(0);
+                    }
+                    buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII));
                 }
-                buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII));
-            }
-            connection.send(createVanillaRegisterPacket(buf));
+                return buf;
+            }));
         }
     }
 
-    protected abstract Packet<?> createVanillaRegisterPacket(FriendlyByteBuf buf);
+    protected abstract Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf);
 
     @Override
     public void send(CustomPacketPayload payload, @Nullable PacketSendListener callback) {

@@ -2,7 +2,9 @@ package lol.bai.badpackets.impl.handler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import lol.bai.badpackets.api.config.ConfigTaskExecutor;
 import lol.bai.badpackets.api.config.ServerConfigPacketReadyCallback;
@@ -46,8 +48,8 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(FriendlyByteBuf buf) {
-        return PlatformProxy.INSTANCE.createVanillaRegisterConfigS2CPacket(buf);
+    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+        return PlatformProxy.INSTANCE.createVanillaRegisterConfigS2CPacket(channels, buf);
     }
 
     @Override
