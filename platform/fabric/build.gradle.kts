@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.3.+"
+    id("fabric-loom") version "1.6.6"
 }
 
 setupPlatform()
@@ -9,7 +9,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
 
     modImplementation("net.fabricmc:fabric-loader:${rootProp["fabricLoader"]}")
-//    modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
 }
 
 loom {

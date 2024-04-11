@@ -37,7 +37,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
 
     private final Map<ResourceLocation, StreamCodec<?, ?>> codecs = new HashMap<>();
     private final Map<ResourceLocation, R> receivers = new HashMap<>();
-    private final Set<AbstractPacketHandler<R>> handlers = new HashSet<>();
+    private final Set<AbstractPacketHandler<R, B>> handlers = new HashSet<>();
 
     private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
 
@@ -72,7 +72,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
             }
 
             receivers.put(id, receiver);
-            for (AbstractPacketHandler<R> handler : handlers) {
+            for (AbstractPacketHandler<R, B> handler : handlers) {
                 handler.onRegister(id);
             }
         } finally {
@@ -125,7 +125,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         }
     }
 
-    public void addHandler(AbstractPacketHandler<R> handler) {
+    public void addHandler(AbstractPacketHandler<R, B> handler) {
         Lock lock = locks.writeLock();
         lock.lock();
 
@@ -136,7 +136,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         }
     }
 
-    public void removeHandler(AbstractPacketHandler<R> handler) {
+    public void removeHandler(AbstractPacketHandler<R, B> handler) {
         Lock lock = locks.writeLock();
         lock.lock();
 

@@ -15,17 +15,17 @@ allprojects {
     version = rootProject.version
 
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
 
         withSourcesJar()
     }
 
     tasks.withType<JavaCompile> {
         options.encoding = StandardCharsets.UTF_8.name()
-        options.release.set(17)
+        options.release.set(21)
     }
 }
 
@@ -55,13 +55,17 @@ subprojects {
     }
 }
 
+repositories {
+    maven("https://maven.fabricmc.net/")
+}
+
 minecraft {
     version(rootProp["minecraft"])
 }
 
 dependencies {
-    compileOnly("org.spongepowered:mixin:0.8.5")
-    compileOnly("org.ow2.asm:asm:9.2")
+    compileOnly("net.fabricmc:sponge-mixin:0.13.2+mixin.0.8.5")
+    compileOnly("org.ow2.asm:asm:9.6")
 }
 
 sourceSets {

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import lol.bai.badpackets.api.config.ConfigTaskExecutor;
 import lol.bai.badpackets.api.config.ServerConfigPacketReadyCallback;
@@ -25,7 +24,7 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigPacketReceiver<CustomPacketPayload>> implements ServerConfigPacketReceiver.TaskFinisher {
+public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> implements ServerConfigPacketReceiver.TaskFinisher {
 
     public static final Map<ResourceLocation, CustomTask> CUSTOM_TASKS = new HashMap<>();
 
@@ -48,7 +47,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<FriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterConfigS2CPacket(channels, buf);
     }
 

@@ -1,7 +1,7 @@
 package lol.bai.badpackets.impl.handler;
 
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
@@ -10,13 +10,13 @@ import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPacketReceiver<CustomPacketPayload>> {
+public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPacketReceiver<CustomPacketPayload>, RegistryFriendlyByteBuf> {
 
     private final Minecraft client;
     private final ClientPacketListener listener;
@@ -38,7 +38,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterPlayC2SPacket(channels, buf);
     }
 

@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.netty.buffer.Unpooled;
@@ -27,9 +27,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractPacketHandler<R> implements PacketSender {
+public abstract class AbstractPacketHandler<R, B extends FriendlyByteBuf> implements PacketSender {
 
-    protected final ChannelRegistry<?, R> registry;
+    protected final ChannelRegistry<B, R> registry;
     protected final Logger logger;
 
     private final Function<CustomPacketPayload, Packet<?>> packetFactory;
@@ -40,7 +40,7 @@ public abstract class AbstractPacketHandler<R> implements PacketSender {
 
     private boolean initialized = false;
 
-    protected AbstractPacketHandler(String desc, ChannelRegistry<?, R> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
+    protected AbstractPacketHandler(String desc, ChannelRegistry<B, R> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
         this.logger = LogManager.getLogger(desc);
         this.registry = registry;
         this.packetFactory = packetFactory;
@@ -142,8 +142,7 @@ public abstract class AbstractPacketHandler<R> implements PacketSender {
 
     private void sendVanillaChannelRegisterPacket(Set<ResourceLocation> channels) {
         if (PlatformProxy.INSTANCE.canSendVanillaRegisterPackets() && !channels.isEmpty()) {
-            connection.send(createVanillaRegisterPacket(channels, () -> {
-                FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+            connection.send(createVanillaRegisterPacket(channels, buf -> {
                 boolean first = true;
                 for (ResourceLocation channel : channels) {
                     if (first) {
@@ -153,12 +152,11 @@ public abstract class AbstractPacketHandler<R> implements PacketSender {
                     }
                     buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII));
                 }
-                return buf;
             }));
         }
     }
 
-    protected abstract Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Supplier<FriendlyByteBuf> buf);
+    protected abstract Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<B> buf);
 
     @Override
     public void send(CustomPacketPayload payload, @Nullable PacketSendListener callback) {
