@@ -9,10 +9,10 @@ jobs:
       - id: vars
         run: |
           echo "version=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
       - run: chmod +x gradlew
       - run: ./gradlew build publish curseforge modrinth
@@ -28,16 +28,15 @@ jobs:
       - run: |
           b2 sync --replaceNewer .b2 b2://maven-bai-lol
           b2 clear-account
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: badpackets-${{ steps.vars.outputs.git_hash }}
           path: "./platform/*/build/libs/**.jar"
-      - uses: alexellis/upload-assets@259de5111cb56966d046ced998941e93f91d2c93
+      - uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: |
-            [
-              "./platform/*/build/libs/*[0-9.].jar",
-              "./platform/*/build/libs/*[0-9.]-api.jar"
-            ]
+          tag_name: ${{ steps.vars.outputs.version }}
+          files: |
+            ./platform/*/build/libs/*[0-9.].jar
+            ./platform/*/build/libs/*[0-9.]-api.jar
