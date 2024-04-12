@@ -23,7 +23,7 @@ jobs:
           java-version: 21
           distribution: temurin
       - run: chmod +x gradlew
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-${{ github.ref }}-${{ hashFiles('**/*.gradle.kts') }}
