@@ -39,8 +39,8 @@ public class PlatformProxy {
         return ClientboundCustomPayloadPacket.CONFIG_STREAM_CODEC.decode(createBuf(null, writer));
     }
 
-    public Packet<?> createVanillaRegisterPlayC2SPacket(Set<ResourceLocation> channels, Consumer<? extends FriendlyByteBuf> writer) {
-        return ServerboundCustomPayloadPacket.STREAM_CODEC.decode(createBuf(null, writer));
+    public Packet<?> createVanillaRegisterPlayC2SPacket(RegistryAccess registry, Set<ResourceLocation> channels, Consumer<? extends FriendlyByteBuf> writer) {
+        return ServerboundCustomPayloadPacket.STREAM_CODEC.decode(createBuf(registry, writer));
     }
 
     public Packet<?> createVanillaRegisterPlayS2CPacket(RegistryAccess registry, Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> writer) {

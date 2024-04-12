@@ -40,7 +40,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
 
     @Override
     protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> buf) {
-        return PlatformProxy.INSTANCE.createVanillaRegisterPlayC2SPacket(channels, buf);
+        return PlatformProxy.INSTANCE.createVanillaRegisterPlayC2SPacket(listener.registryAccess(), channels, buf);
     }
 
     @Override
