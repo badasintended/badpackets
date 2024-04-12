@@ -1,10 +1,7 @@
 package lol.bai.badpackets.api.config;
 
 import lol.bai.badpackets.api.PacketSender;
-import lol.bai.badpackets.api.config.ServerConfigPacketReceiver.TaskFinisher;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 
 @FunctionalInterface
 public interface ConfigTaskExecutor {
@@ -16,9 +13,9 @@ public interface ConfigTaskExecutor {
      * and return {@code false} otherwise.
      * <p>
      * Once the client received the task packet, it should send a response packet to the server.
-     * After the server received the response packet, it should call {@link TaskFinisher#finish(ResourceLocation)}
+     * After the server received the response packet, it should call {@link ServerConfigConnectionContext#finishTask(ResourceLocation)}
      * to allow the client to join the server.
      */
-    boolean runTask(ServerConfigurationPacketListenerImpl handler, PacketSender sender, MinecraftServer server);
+    boolean runTask(ServerConfigConnectionContext context);
 
 }

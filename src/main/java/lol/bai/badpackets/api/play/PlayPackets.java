@@ -29,7 +29,7 @@ public final class PlayPackets {
      */
     public static void registerServerChannel(ResourceLocation id, ServerPlayPacketReceiver<FriendlyByteBuf> receiver) {
         ChannelRegistry.PLAY_C2S.registerCodec(id, UntypedPayload.codec(id));
-        ChannelRegistry.PLAY_C2S.registerReceiver(id, (server, player, handler, payload, responseSender) -> receiver.receive(server, player, handler, ((UntypedPayload) payload).buffer(), responseSender));
+        ChannelRegistry.PLAY_C2S.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
     /**
@@ -98,7 +98,7 @@ public final class PlayPackets {
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientPlayPacketReceiver<FriendlyByteBuf> receiver) {
-        ChannelRegistry.PLAY_S2C.registerReceiver(id, (client, handler, payload, responseSender) -> receiver.receive(client, handler, ((UntypedPayload) payload).buffer(), responseSender));
+        ChannelRegistry.PLAY_S2C.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
     /**

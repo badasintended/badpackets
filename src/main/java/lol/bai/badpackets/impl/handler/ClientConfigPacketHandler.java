@@ -3,8 +3,10 @@ package lol.bai.badpackets.impl.handler;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import lol.bai.badpackets.api.config.ClientConfigConnectionContext;
 import lol.bai.badpackets.api.config.ClientConfigPacketReadyCallback;
 import lol.bai.badpackets.api.config.ClientConfigPacketReceiver;
+import lol.bai.badpackets.api.config.ConfigPackets;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
@@ -12,12 +14,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> {
+public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> implements ClientConfigConnectionContext {
 
     private final Minecraft client;
     private final ClientConfigurationPacketListenerImpl listener;
@@ -37,7 +40,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfi
     @Override
     protected void onInitialChannelSyncPacketReceived() {
         for (ClientConfigPacketReadyCallback callback : CallbackRegistry.CLIENT_READY_CONFIG) {
-            callback.onConfig(listener, this, client);
+            callback.onConfig(this);
         }
 
         sendInitialChannelSyncPacket();
@@ -45,7 +48,22 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfi
 
     @Override
     protected void receiveUnsafe(ClientConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
-        receiver.receive(client, listener, payload, this);
+        receiver.receive(this, payload);
+    }
+
+    @Override
+    public Minecraft client() {
+        return client;
+    }
+
+    @Override
+    public ClientConfigurationPacketListenerImpl handler() {
+        return listener;
+    }
+
+    @Override
+    public void disconnect(Component reason) {
+        ConfigPackets.disconnect(listener, reason);
     }
 
 }

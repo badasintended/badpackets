@@ -26,23 +26,23 @@ public class BadPacketTest {
     public static void server() {
         // TASK --------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerTask(CONFIG_TASK, (handler, sender, server) -> {
-            if (sender.canSend(TestTaskPayload.TYPE)) {
-                sender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_1));
+        ConfigPackets.registerTask(CONFIG_TASK, context -> {
+            if (context.canSend(TestTaskPayload.TYPE)) {
+                context.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_1));
                 return true;
             }
 
             return false;
         });
 
-        ConfigPackets.registerServerChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) -> {
+        ConfigPackets.registerServerChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (context, payload) -> {
             LOGGER.info("[config task] client -> server " + payload.stage().name());
 
             switch (payload.stage()) {
-                case ANSWER_1 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_2));
-                case ANSWER_2 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_3));
-                case ANSWER_3 -> taskFinisher.finish(CONFIG_TASK);
-                default -> handler.disconnect(Component.literal("invalid stage"));
+                case ANSWER_1 -> context.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_2));
+                case ANSWER_2 -> context.send(new TestTaskPayload(TestTaskPayload.Stage.QUESTION_3));
+                case ANSWER_3 -> context.finishTask(CONFIG_TASK);
+                default -> context.handler().disconnect(Component.literal("invalid stage"));
             }
         });
 
@@ -50,21 +50,21 @@ public class BadPacketTest {
 
         // CONFIG ------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerServerChannel(CONFIG_C2S, (server, handler, buf, responseSender, taskFinisher) ->
+        ConfigPackets.registerServerChannel(CONFIG_C2S, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerServerChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (server, handler, payload, responseSender, taskFinisher) ->
+        ConfigPackets.registerServerChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (context, payload) ->
             LOGGER.info(payload.msg()));
 
-        ConfigPackets.registerServerReadyCallback((handler, sender, server) -> {
-            Validate.isTrue(sender.canSend(BadPacketTest.CONFIG_S2C));
-            Validate.isTrue(sender.canSend(TestConfigPayload.TYPE));
+        ConfigPackets.registerServerReadyCallback(context -> {
+            Validate.isTrue(context.canSend(BadPacketTest.CONFIG_S2C));
+            Validate.isTrue(context.canSend(TestConfigPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[config untyped] server -> client");
-            sender.send(BadPacketTest.CONFIG_S2C, buf);
+            context.send(BadPacketTest.CONFIG_S2C, buf);
 
-            sender.send(new TestConfigPayload("[config typed] server -> client"));
+            context.send(new TestConfigPayload("[config typed] server -> client"));
         });
 
         ConfigPackets.registerClientChannel(CONFIG_S2C);
@@ -72,21 +72,21 @@ public class BadPacketTest {
 
         // PLAY --------------------------------------------------------------------------------------------------------
 
-        PlayPackets.registerServerChannel(PLAY_C2S, (server, player, handler, buf, responseSender) ->
+        PlayPackets.registerServerChannel(PLAY_C2S, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerServerChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (server, player, handler, payload, responseSender) ->
+        PlayPackets.registerServerChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (context, payload) ->
             LOGGER.info(payload.msg()));
 
-        PlayPackets.registerServerReadyCallback((handler, sender, server) -> {
-            Validate.isTrue(sender.canSend(BadPacketTest.PLAY_S2C));
-            Validate.isTrue(sender.canSend(TestPlayPayload.TYPE));
+        PlayPackets.registerServerReadyCallback(context -> {
+            Validate.isTrue(context.canSend(BadPacketTest.PLAY_S2C));
+            Validate.isTrue(context.canSend(TestPlayPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[play untyped] server -> client");
-            sender.send(BadPacketTest.PLAY_S2C, buf);
+            context.send(BadPacketTest.PLAY_S2C, buf);
 
-            sender.send(new TestPlayPayload("[play typed] server -> client"));
+            context.send(new TestPlayPayload("[play typed] server -> client"));
         });
 
         PlayPackets.registerClientChannel(PLAY_S2C);
@@ -96,53 +96,53 @@ public class BadPacketTest {
     public static void client() {
         // TASK --------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerClientReceiver(TestTaskPayload.TYPE, (client, handler, payload, responseSender) -> {
+        ConfigPackets.registerClientReceiver(TestTaskPayload.TYPE, (context, payload) -> {
             LOGGER.info("[config task] server -> client " + payload.stage().name());
 
             switch (payload.stage()) {
-                case QUESTION_1 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_1));
-                case QUESTION_2 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_2));
-                case QUESTION_3 -> responseSender.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_3));
-                default -> ConfigPackets.disconnect(handler, Component.literal("invalid stage"));
+                case QUESTION_1 -> context.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_1));
+                case QUESTION_2 -> context.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_2));
+                case QUESTION_3 -> context.send(new TestTaskPayload(TestTaskPayload.Stage.ANSWER_3));
+                default -> context.disconnect(Component.literal("invalid stage"));
             }
         });
 
         // CONFIG ------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerClientReceiver(CONFIG_S2C, (client, handler, buf, responseSender) ->
+        ConfigPackets.registerClientReceiver(CONFIG_S2C, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerClientReceiver(TestConfigPayload.TYPE, (client, handler, payload, responseSender) ->
+        ConfigPackets.registerClientReceiver(TestConfigPayload.TYPE, (context, payload) ->
             LOGGER.info(payload.msg()));
 
-        ConfigPackets.registerClientReadyCallback((handler, sender, client) -> {
-            Validate.isTrue(sender.canSend(BadPacketTest.CONFIG_C2S));
-            Validate.isTrue(sender.canSend(TestConfigPayload.TYPE));
+        ConfigPackets.registerClientReadyCallback(context -> {
+            Validate.isTrue(context.canSend(BadPacketTest.CONFIG_C2S));
+            Validate.isTrue(context.canSend(TestConfigPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[config untyped] client -> server");
-            sender.send(BadPacketTest.CONFIG_C2S, buf);
+            context.send(BadPacketTest.CONFIG_C2S, buf);
 
-            sender.send(new TestConfigPayload("[config typed] client -> server"));
+            context.send(new TestConfigPayload("[config typed] client -> server"));
         });
 
         // PLAY --------------------------------------------------------------------------------------------------------
 
-        PlayPackets.registerClientReceiver(PLAY_S2C, (client, handler, buf, responseSender) ->
+        PlayPackets.registerClientReceiver(PLAY_S2C, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerClientReceiver(TestPlayPayload.TYPE, (client, handler, payload, responseSender) ->
+        PlayPackets.registerClientReceiver(TestPlayPayload.TYPE, (context, payload) ->
             LOGGER.info(payload.msg()));
 
-        PlayPackets.registerClientReadyCallback((handler, sender, client) -> {
-            Validate.isTrue(sender.canSend(BadPacketTest.PLAY_C2S));
-            Validate.isTrue(sender.canSend(TestPlayPayload.TYPE));
+        PlayPackets.registerClientReadyCallback(context -> {
+            Validate.isTrue(context.canSend(BadPacketTest.PLAY_C2S));
+            Validate.isTrue(context.canSend(TestPlayPayload.TYPE));
 
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeUtf("[play untyped] client -> server");
-            sender.send(BadPacketTest.PLAY_C2S, buf);
+            context.send(BadPacketTest.PLAY_C2S, buf);
 
-            sender.send(new TestPlayPayload("[play typed] client -> server"));
+            context.send(new TestPlayPayload("[play typed] client -> server"));
         });
     }
 

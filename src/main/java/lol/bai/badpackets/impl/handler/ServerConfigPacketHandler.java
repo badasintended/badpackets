@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import lol.bai.badpackets.api.config.ConfigTaskExecutor;
+import lol.bai.badpackets.api.config.ServerConfigConnectionContext;
 import lol.bai.badpackets.api.config.ServerConfigPacketReadyCallback;
 import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
 import lol.bai.badpackets.impl.Constants;
@@ -24,7 +25,7 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> implements ServerConfigPacketReceiver.TaskFinisher {
+public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> implements ServerConfigConnectionContext {
 
     public static final Map<ResourceLocation, CustomTask> CUSTOM_TASKS = new HashMap<>();
 
@@ -54,7 +55,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     @Override
     protected void onInitialChannelSyncPacketReceived() {
         for (ServerConfigPacketReadyCallback callback : CallbackRegistry.SERVER_READY_CONFIG) {
-            callback.onConfig(listener, this, server);
+            callback.onConfig(this);
         }
 
         ((TaskFinisher) listener).badpackets_finishTask(CallbackTask.TYPE);
@@ -62,11 +63,21 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
 
     @Override
     protected void receiveUnsafe(ServerConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
-        receiver.receive(server, listener, payload, this, this);
+        receiver.receive(this, payload);
     }
 
     @Override
-    public void finish(ResourceLocation taskId) {
+    public MinecraftServer server() {
+        return server;
+    }
+
+    @Override
+    public ServerConfigurationPacketListenerImpl handler() {
+        return listener;
+    }
+
+    @Override
+    public void finishTask(ResourceLocation taskId) {
         ((TaskFinisher) listener).badpackets_finishTask(CUSTOM_TASKS.get(taskId).type);
     }
 
@@ -111,7 +122,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
 
         @Override
         public void start(@NotNull Consumer<Packet<?>> consumer) {
-            if (!executor.runTask(handler.listener, handler, handler.server)) {
+            if (!executor.runTask(handler)) {
                 ((TaskFinisher) handler.listener).badpackets_finishTask(type);
             }
         }

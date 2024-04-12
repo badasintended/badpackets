@@ -46,7 +46,7 @@ public final class ConfigPackets {
      */
     public static void registerServerChannel(ResourceLocation id, ServerConfigPacketReceiver<FriendlyByteBuf> receiver) {
         ChannelRegistry.CONFIG_C2S.registerCodec(id, UntypedPayload.codec(id));
-        ChannelRegistry.CONFIG_C2S.registerReceiver(id, (server, handler, payload, responseSender, taskFinisher) -> receiver.receive(server, handler, ((UntypedPayload) payload).buffer(), responseSender, taskFinisher));
+        ChannelRegistry.CONFIG_C2S.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
     /**
@@ -121,7 +121,7 @@ public final class ConfigPackets {
      */
     @ApiSide.ClientOnly
     public static void registerClientReceiver(ResourceLocation id, ClientConfigPacketReceiver<FriendlyByteBuf> receiver) {
-        ChannelRegistry.CONFIG_S2C.registerReceiver(id, (client, handler, payload, responseSender) -> receiver.receive(client, handler, ((UntypedPayload) payload).buffer(), responseSender));
+        ChannelRegistry.CONFIG_S2C.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
     /**
@@ -161,11 +161,11 @@ public final class ConfigPackets {
      * Helper method to disconnect client-to-server connection.
      *
      * @param handler the handler instance
-     * @param cause   the disconnection cause
+     * @param reason   the disconnection reason
      */
     @ApiSide.ClientOnly
-    public static void disconnect(ClientConfigurationPacketListenerImpl handler, Component cause) {
-        ((AccessClientCommonPacketListenerImpl) handler).badpackets_connection().disconnect(cause);
+    public static void disconnect(ClientConfigurationPacketListenerImpl handler, Component reason) {
+        ((AccessClientCommonPacketListenerImpl) handler).badpackets_connection().disconnect(reason);
     }
 
     private ConfigPackets() {

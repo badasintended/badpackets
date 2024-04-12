@@ -1,7 +1,6 @@
 package lol.bai.badpackets.api;
 
 import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
-import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
 import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
@@ -39,8 +38,8 @@ public interface PacketSender {
      *
      * @param player the player that we want to send packets to.
      *
-     * @see PlayPackets#registerClientChannel(ResourceLocation, ClientPlayPacketReceiver)
-     * @see PlayPackets#registerClientChannel(CustomPacketPayload.Type, StreamCodec, ClientPlayPacketReceiver)
+     * @see PlayPackets#registerClientChannel(ResourceLocation)
+     * @see PlayPackets#registerClientChannel(CustomPacketPayload.Type, StreamCodec)
      */
     @ApiSide.ServerOnly
     static PacketSender s2c(ServerPlayer player) {
