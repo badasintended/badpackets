@@ -19,8 +19,9 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-public class ChannelRegistry<B extends FriendlyByteBuf, R> {
+public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCodecFinder {
 
     private static final Set<ResourceLocation> RESERVED_CHANNELS = Set.of(
         Constants.CHANNEL_SYNC,
@@ -102,8 +103,9 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public StreamCodec<FriendlyByteBuf, CustomPacketPayload> getCodec(ResourceLocation id) {
+    public @Nullable StreamCodec<FriendlyByteBuf, CustomPacketPayload> getCodec(ResourceLocation id, FriendlyByteBuf buf) {
         Lock lock = locks.readLock();
         lock.lock();
 

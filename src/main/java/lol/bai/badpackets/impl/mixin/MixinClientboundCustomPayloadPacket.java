@@ -1,20 +1,22 @@
 package lol.bai.badpackets.impl.mixin;
 
+import java.util.List;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
+import lol.bai.badpackets.impl.registry.ChannelCodecFinder;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload.FallbackProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientboundCustomPayloadPacket.class)
 public abstract class MixinClientboundCustomPayloadPacket {
@@ -29,38 +31,36 @@ public abstract class MixinClientboundCustomPayloadPacket {
         }
     }
 
-    @Unique
-    private static void badpackets_getPlayCodec(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        var codec = ChannelRegistry.PLAY_S2C.getCodec(id);
-        if (codec != null) cir.setReturnValue(codec);
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", ordinal = 0, target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private static StreamCodec<?, ?> badpackets_attachPlayChannelCodecs(FallbackProvider<?> fallbackProvider, List<?> list, Operation<StreamCodec<?, ?>> original) {
+        var codec = original.call(fallbackProvider, list);
+        ChannelCodecFinder.attach(codec, ChannelRegistry.PLAY_S2C);
+        return codec;
     }
 
-    @Unique
-    private static void badpackets_getConfigCodec(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        var codec = ChannelRegistry.CONFIG_S2C.getCodec(id);
-        if (codec != null) cir.setReturnValue(codec);
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", ordinal = 1, target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private static StreamCodec<?, ?> badpackets_attachConfigChannelCodecs(FallbackProvider<?> fallbackProvider, List<?> list, Operation<StreamCodec<?, ?>> original) {
+        var codec = original.call(fallbackProvider, list);
+        ChannelCodecFinder.attach(codec, ChannelRegistry.CONFIG_S2C);
+        return codec;
     }
 
-    @Inject(method = "lambda$static$0", at = @At("HEAD"), cancellable = true, require = 0)
-    private static void badpackets_getPlayCodec_mojmap(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        badpackets_getPlayCodec(id, cir);
-    }
-
-    @Inject(method = "lambda$static$1", at = @At("HEAD"), cancellable = true, require = 0)
-    private static void badpackets_getConfigCodec_mojmap(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        badpackets_getConfigCodec(id, cir);
-    }
-
-    @SuppressWarnings({"UnresolvedMixinReference", "MixinAnnotationTarget"})
-    @Inject(method = "method_56461", at = @At("HEAD"), cancellable = true, require = 0)
-    private static void badpackets_getPlayCodec_intermediary(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        badpackets_getPlayCodec(id, cir);
-    }
-
-    @SuppressWarnings({"UnresolvedMixinReference", "MixinAnnotationTarget"})
-    @Inject(method = "method_56460", at = @At("HEAD"), cancellable = true, require = 0)
-    private static void badpackets_getConfigCodec_intermediary(ResourceLocation id, CallbackInfoReturnable<StreamCodec<FriendlyByteBuf, CustomPacketPayload>> cir) {
-        badpackets_getConfigCodec(id, cir);
-    }
+//    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", ordinal = 0, target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
+//    private static CustomPacketPayload.FallbackProvider<?> badpackets_getPlayCodec(CustomPacketPayload.FallbackProvider<?> original) {
+//        return id -> {
+//            var codec = ChannelRegistry.PLAY_S2C.getCodec(id, null);
+//            if (codec != null) return codec;
+//            return original.create(id);
+//        };
+//    }
+//
+//    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", ordinal = 1, target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
+//    private static CustomPacketPayload.FallbackProvider<FriendlyByteBuf> badpackets_getConfigCodec(CustomPacketPayload.FallbackProvider<FriendlyByteBuf> original) {
+//        return id -> {
+//            var codec = ChannelRegistry.CONFIG_S2C.getCodec(id);
+//            if (codec != null) return codec;
+//            return original.create(id);
+//        };
+//    }
 
 }
