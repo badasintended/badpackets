@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.netty.buffer.Unpooled;
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
@@ -27,9 +28,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractPacketHandler<R, B extends FriendlyByteBuf> implements PacketSender {
+public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implements PacketSender {
 
-    protected final ChannelRegistry<B, R> registry;
+    protected final ChannelRegistry<B, C> registry;
     protected final Logger logger;
 
     private final Function<CustomPacketPayload, Packet<?>> packetFactory;
@@ -40,7 +41,7 @@ public abstract class AbstractPacketHandler<R, B extends FriendlyByteBuf> implem
 
     private boolean initialized = false;
 
-    protected AbstractPacketHandler(String desc, ChannelRegistry<B, R> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
+    protected AbstractPacketHandler(String desc, ChannelRegistry<B, C> registry, Function<CustomPacketPayload, Packet<?>> packetFactory, BlockableEventLoop<?> eventLoop, Connection connection) {
         this.logger = LogManager.getLogger(desc);
         this.registry = registry;
         this.packetFactory = packetFactory;
@@ -81,7 +82,7 @@ public abstract class AbstractPacketHandler<R, B extends FriendlyByteBuf> implem
 
         if (registry.has(id)) {
             try {
-                R receiver = registry.get(id);
+                PacketReceiver<C, CustomPacketPayload> receiver = registry.get(id);
 
                 if (payload instanceof UntypedPayload || eventLoop.isSameThread()) {
                     receiveUnsafe(receiver, payload);
@@ -100,7 +101,7 @@ public abstract class AbstractPacketHandler<R, B extends FriendlyByteBuf> implem
 
     protected abstract void onInitialChannelSyncPacketReceived();
 
-    protected abstract void receiveUnsafe(R receiver, CustomPacketPayload payload);
+    protected abstract void receiveUnsafe(PacketReceiver<C, CustomPacketPayload> receiver, CustomPacketPayload payload);
 
     public void sendInitialChannelSyncPacket() {
         if (!initialized) {

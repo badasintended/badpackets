@@ -9,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiSide.ClientOnly
 @ApiStatus.NonExtendable
-public interface ClientConfigConnectionContext extends PacketSender {
+public interface ClientConfigContext extends PacketSender {
 
     Minecraft client();
 

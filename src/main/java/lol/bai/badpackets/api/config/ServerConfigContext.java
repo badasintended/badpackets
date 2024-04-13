@@ -7,7 +7,7 @@ import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.NonExtendable
-public interface ServerConfigConnectionContext extends PacketSender {
+public interface ServerConfigContext extends PacketSender {
 
     MinecraftServer server();
 

@@ -3,9 +3,8 @@ package lol.bai.badpackets.impl.handler;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import lol.bai.badpackets.api.play.ClientPlayConnectionContext;
-import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
-import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
+import lol.bai.badpackets.api.PacketReceiver;
+import lol.bai.badpackets.api.play.ClientPlayContext;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
@@ -17,7 +16,7 @@ import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPacketReceiver<CustomPacketPayload>, RegistryFriendlyByteBuf> implements ClientPlayConnectionContext {
+public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayContext, RegistryFriendlyByteBuf> implements ClientPlayContext {
 
     private final Minecraft client;
     private final ClientPacketListener listener;
@@ -46,13 +45,13 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
     @Override
     protected void onInitialChannelSyncPacketReceived() {
         sendInitialChannelSyncPacket();
-        for (ClientPlayPacketReadyCallback callback : CallbackRegistry.CLIENT_PLAY) {
+        for (var callback : CallbackRegistry.CLIENT_PLAY) {
             callback.onReady(this);
         }
     }
 
     @Override
-    protected void receiveUnsafe(ClientPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receiveUnsafe(PacketReceiver<ClientPlayContext, CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(this, payload);
     }
 

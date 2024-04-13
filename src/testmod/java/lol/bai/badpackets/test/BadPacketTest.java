@@ -23,8 +23,11 @@ public class BadPacketTest {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BadPacketTest.class);
 
-    public static void server() {
+    public static void common() {
         // TASK --------------------------------------------------------------------------------------------------------
+
+        ConfigPackets.registerServerChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC);
+        ConfigPackets.registerClientChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC);
 
         ConfigPackets.registerTask(CONFIG_TASK, context -> {
             if (context.canSend(TestTaskPayload.TYPE)) {
@@ -35,7 +38,7 @@ public class BadPacketTest {
             return false;
         });
 
-        ConfigPackets.registerServerChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC, (context, payload) -> {
+        ConfigPackets.registerServerReceiver(TestTaskPayload.TYPE, (context, payload) -> {
             LOGGER.info("[config task] client -> server " + payload.stage().name());
 
             switch (payload.stage()) {
@@ -46,14 +49,17 @@ public class BadPacketTest {
             }
         });
 
-        ConfigPackets.registerClientChannel(TestTaskPayload.TYPE, TestTaskPayload.CODEC);
-
         // CONFIG ------------------------------------------------------------------------------------------------------
 
-        ConfigPackets.registerServerChannel(CONFIG_C2S, (context, buf) ->
+        ConfigPackets.registerServerChannel(CONFIG_C2S);
+        ConfigPackets.registerClientChannel(CONFIG_S2C);
+        ConfigPackets.registerServerChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC);
+        ConfigPackets.registerClientChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC);
+
+        ConfigPackets.registerServerReceiver(CONFIG_C2S, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        ConfigPackets.registerServerChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC, (context, payload) ->
+        ConfigPackets.registerServerReceiver(TestConfigPayload.TYPE, (context, payload) ->
             LOGGER.info(payload.msg()));
 
         ConfigPackets.registerServerReadyCallback(context -> {
@@ -67,15 +73,17 @@ public class BadPacketTest {
             context.send(new TestConfigPayload("[config typed] server -> client"));
         });
 
-        ConfigPackets.registerClientChannel(CONFIG_S2C);
-        ConfigPackets.registerClientChannel(TestConfigPayload.TYPE, TestConfigPayload.CODEC);
-
         // PLAY --------------------------------------------------------------------------------------------------------
 
-        PlayPackets.registerServerChannel(PLAY_C2S, (context, buf) ->
+        PlayPackets.registerServerChannel(PLAY_C2S);
+        PlayPackets.registerClientChannel(PLAY_S2C);
+        PlayPackets.registerServerChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC);
+        PlayPackets.registerClientChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC);
+
+        PlayPackets.registerServerReceiver(PLAY_C2S, (context, buf) ->
             LOGGER.info(buf.readUtf()));
 
-        PlayPackets.registerServerChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC, (context, payload) ->
+        PlayPackets.registerServerReceiver(TestPlayPayload.TYPE, (context, payload) ->
             LOGGER.info(payload.msg()));
 
         PlayPackets.registerServerReadyCallback(context -> {
@@ -89,8 +97,6 @@ public class BadPacketTest {
             context.send(new TestPlayPayload("[play typed] server -> client"));
         });
 
-        PlayPackets.registerClientChannel(PLAY_S2C);
-        PlayPackets.registerClientChannel(TestPlayPayload.TYPE, TestPlayPayload.CODEC);
     }
 
     public static void client() {

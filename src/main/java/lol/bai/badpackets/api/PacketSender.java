@@ -1,9 +1,8 @@
 package lol.bai.badpackets.api;
 
-import lol.bai.badpackets.api.play.ClientPlayPacketReadyCallback;
+import lol.bai.badpackets.api.play.ClientPlayContext;
 import lol.bai.badpackets.api.play.PlayPackets;
-import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
-import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
+import lol.bai.badpackets.api.play.ServerPlayContext;
 import lol.bai.badpackets.impl.handler.ClientPlayPacketHandler;
 import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
@@ -25,11 +24,11 @@ public interface PacketSender {
      * <p>
      * <b>Only available when on game.</b>
      *
-     * @see PlayPackets#registerServerChannel(ResourceLocation, ServerPlayPacketReceiver)
-     * @see PlayPackets#registerServerChannel(CustomPacketPayload.Type, StreamCodec, ServerPlayPacketReceiver)
+     * @see PlayPackets#registerServerChannel(ResourceLocation)
+     * @see PlayPackets#registerServerChannel(CustomPacketPayload.Type, StreamCodec)
      */
     @ApiSide.ClientOnly
-    static PacketSender c2s() {
+    static ClientPlayContext c2s() {
         return ClientPlayPacketHandler.get();
     }
 
@@ -41,8 +40,7 @@ public interface PacketSender {
      * @see PlayPackets#registerClientChannel(ResourceLocation)
      * @see PlayPackets#registerClientChannel(CustomPacketPayload.Type, StreamCodec)
      */
-    @ApiSide.ServerOnly
-    static PacketSender s2c(ServerPlayer player) {
+    static ServerPlayContext s2c(ServerPlayer player) {
         return ServerPlayPacketHandler.get(player);
     }
 
@@ -51,8 +49,8 @@ public interface PacketSender {
      * <p>
      * <b>Note:</b> Only works for Bad Packets channels.
      *
-     * @see PlayPackets#registerClientReadyCallback(ClientPlayPacketReadyCallback)
-     * @see PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)
+     * @see PlayPackets#registerClientReadyCallback(PacketReadyCallback)
+     * @see PlayPackets#registerServerReadyCallback(PacketReadyCallback)
      */
     boolean canSend(ResourceLocation id);
 
@@ -61,8 +59,8 @@ public interface PacketSender {
      * <p>
      * <b>Note:</b> Only works for Bad Packets channels.
      *
-     * @see PlayPackets#registerClientReadyCallback(ClientPlayPacketReadyCallback)
-     * @see PlayPackets#registerServerReadyCallback(ServerPlayPacketReadyCallback)
+     * @see PlayPackets#registerClientReadyCallback(PacketReadyCallback)
+     * @see PlayPackets#registerServerReadyCallback(PacketReadyCallback)
      */
     default boolean canSend(CustomPacketPayload.Type<?> type) {
         return canSend(type.id());

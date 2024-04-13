@@ -11,7 +11,7 @@ public class FabricBadPacketTest implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        BadPacketTest.server();
+        BadPacketTest.common();
 
         // TODO
         // ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {

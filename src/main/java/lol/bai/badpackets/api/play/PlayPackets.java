@@ -1,5 +1,7 @@
 package lol.bai.badpackets.api.play;
 
+import lol.bai.badpackets.api.PacketReadyCallback;
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
@@ -21,30 +23,58 @@ public final class PlayPackets {
     /**
      * Register a client-to-server packet channel.
      * <p>
+     * This method needs to be called on <b>all sides</b>.
+     * <p>
+     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(ResourceLocation, PacketReceiver)}
+     *
+     * @param id the packet id
+     */
+    public static void registerServerChannel(ResourceLocation id) {
+        ChannelRegistry.PLAY_C2S.registerCodec(id, UntypedPayload.codec(id));
+    }
+
+    /**
+     * Register a client-to-server packet channel.
+     * <p>
+     * This method needs to be called on <b>all sides</b>.
+     * <p>
+     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(CustomPacketPayload.Type, PacketReceiver)}
+     *
+     * @param type  the {@linkplain CustomPacketPayload#type() packet type}
+     * @param codec the payload codec
+     */
+    public static <P extends CustomPacketPayload> void registerServerChannel(CustomPacketPayload.Type<P> type, StreamCodec<? super RegistryFriendlyByteBuf, P> codec) {
+        ChannelRegistry.PLAY_C2S.registerCodec(type.id(), codec);
+    }
+
+    /**
+     * Register a server-to-client packet receiver.
+     * <p>
+     * The channel needs to be {@linkplain #registerServerChannel(ResourceLocation) registered} first.
+     * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain MinecraftServer#execute(Runnable) server thread}.
      *
      * @param id       the packet id
      * @param receiver the receiver
      */
-    public static void registerServerChannel(ResourceLocation id, ServerPlayPacketReceiver<FriendlyByteBuf> receiver) {
-        ChannelRegistry.PLAY_C2S.registerCodec(id, UntypedPayload.codec(id));
+    public static void registerServerReceiver(ResourceLocation id, PacketReceiver<ServerPlayContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.PLAY_C2S.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
     /**
-     * Register a client-to-server packet channel.
+     * Register a client-to-server packet receiver.
+     * <p>
+     * The channel needs to be {@linkplain #registerServerChannel(CustomPacketPayload.Type, StreamCodec) registered} first.
      * <p>
      * Typed packet receiver is run on the main server thread.
      *
      * @param type     the {@linkplain CustomPacketPayload#type() packet type}
-     * @param codec    the payload codec
      * @param receiver the receiver
      */
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerServerChannel(CustomPacketPayload.Type<P> type, StreamCodec<? super RegistryFriendlyByteBuf, P> codec, ServerPlayPacketReceiver<P> receiver) {
-        ChannelRegistry.PLAY_C2S.registerCodec(type.id(), codec);
-        ChannelRegistry.PLAY_C2S.registerReceiver(type.id(), (ServerPlayPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerServerReceiver(CustomPacketPayload.Type<P> type, PacketReceiver<ServerPlayContext, P> receiver) {
+        ChannelRegistry.PLAY_C2S.registerReceiver(type.id(), (PacketReceiver<ServerPlayContext, CustomPacketPayload>) receiver);
     }
 
     /**
@@ -54,7 +84,7 @@ public final class PlayPackets {
      * <p>
      * Not a general-purpose player join callback, use platform specific API for that.
      */
-    public static void registerServerReadyCallback(ServerPlayPacketReadyCallback callback) {
+    public static void registerServerReadyCallback(PacketReadyCallback<ServerPlayContext> callback) {
         CallbackRegistry.SERVER_PLAY.add(callback);
     }
 
@@ -63,7 +93,7 @@ public final class PlayPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(ResourceLocation, ClientPlayPacketReceiver)}
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(ResourceLocation, PacketReceiver)}
      *
      * @param id the packet id
      */
@@ -76,7 +106,7 @@ public final class PlayPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(CustomPacketPayload.Type, ClientPlayPacketReceiver)}
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(CustomPacketPayload.Type, PacketReceiver)}
      *
      * @param type  the {@linkplain CustomPacketPayload#type() packet type}
      * @param codec the payload codec
@@ -97,7 +127,7 @@ public final class PlayPackets {
      * @param receiver the receiver
      */
     @ApiSide.ClientOnly
-    public static void registerClientReceiver(ResourceLocation id, ClientPlayPacketReceiver<FriendlyByteBuf> receiver) {
+    public static void registerClientReceiver(ResourceLocation id, PacketReceiver<ClientPlayContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.PLAY_S2C.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
@@ -113,8 +143,8 @@ public final class PlayPackets {
      */
     @ApiSide.ClientOnly
     @SuppressWarnings("unchecked")
-    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, ClientPlayPacketReceiver<P> receiver) {
-        ChannelRegistry.PLAY_S2C.registerReceiver(type.id(), (ClientPlayPacketReceiver<CustomPacketPayload>) receiver);
+    public static <P extends CustomPacketPayload> void registerClientReceiver(CustomPacketPayload.Type<P> type, PacketReceiver<ClientPlayContext, P> receiver) {
+        ChannelRegistry.PLAY_S2C.registerReceiver(type.id(), (PacketReceiver<ClientPlayContext, CustomPacketPayload>) receiver);
     }
 
     /**
@@ -125,7 +155,7 @@ public final class PlayPackets {
      * Not a general-purpose player join callback, use platform specific API for that.
      */
     @ApiSide.ClientOnly
-    public static void registerClientReadyCallback(ClientPlayPacketReadyCallback callback) {
+    public static void registerClientReadyCallback(PacketReadyCallback<ClientPlayContext> callback) {
         CallbackRegistry.CLIENT_PLAY.add(callback);
     }
 

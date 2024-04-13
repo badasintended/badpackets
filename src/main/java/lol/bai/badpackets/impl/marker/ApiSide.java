@@ -17,15 +17,4 @@ public class ApiSide {
 
     }
 
-    /**
-     * Anything that has this annotation means that it function only available on the logical server.
-     * <p>
-     * Marker only annotation, doesn't actually restrict access on runtime.
-     */
-    @Documented
-    @Retention(RetentionPolicy.CLASS)
-    public @interface ServerOnly {
-
-    }
-
 }

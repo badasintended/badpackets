@@ -5,10 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.config.ConfigTaskExecutor;
-import lol.bai.badpackets.api.config.ServerConfigConnectionContext;
-import lol.bai.badpackets.api.config.ServerConfigPacketReadyCallback;
-import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
+import lol.bai.badpackets.api.config.ServerConfigContext;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.CallbackRegistry;
@@ -25,7 +24,7 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigPacketReceiver<CustomPacketPayload>, FriendlyByteBuf> implements ServerConfigConnectionContext {
+public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigContext, FriendlyByteBuf> implements ServerConfigContext {
 
     public static final Map<ResourceLocation, CustomTask> CUSTOM_TASKS = new HashMap<>();
 
@@ -54,15 +53,15 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
 
     @Override
     protected void onInitialChannelSyncPacketReceived() {
-        for (ServerConfigPacketReadyCallback callback : CallbackRegistry.SERVER_READY_CONFIG) {
-            callback.onConfig(this);
+        for (var callback : CallbackRegistry.SERVER_READY_CONFIG) {
+            callback.onReady(this);
         }
 
         ((TaskFinisher) listener).badpackets_finishTask(CallbackTask.TYPE);
     }
 
     @Override
-    protected void receiveUnsafe(ServerConfigPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
+    protected void receiveUnsafe(PacketReceiver<ServerConfigContext, CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(this, payload);
     }
 

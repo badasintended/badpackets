@@ -7,10 +7,11 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import lol.bai.badpackets.api.config.ClientConfigPacketReceiver;
-import lol.bai.badpackets.api.config.ServerConfigPacketReceiver;
-import lol.bai.badpackets.api.play.ClientPlayPacketReceiver;
-import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
+import lol.bai.badpackets.api.PacketReceiver;
+import lol.bai.badpackets.api.config.ClientConfigContext;
+import lol.bai.badpackets.api.config.ServerConfigContext;
+import lol.bai.badpackets.api.play.ClientPlayContext;
+import lol.bai.badpackets.api.play.ServerPlayContext;
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
@@ -21,24 +22,24 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCodecFinder {
+public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCodecFinder {
 
     private static final Set<ResourceLocation> RESERVED_CHANNELS = Set.of(
         Constants.CHANNEL_SYNC,
         Constants.MC_REGISTER_CHANNEL,
         Constants.MC_UNREGISTER_CHANNEL);
 
-    public static final ChannelRegistry<FriendlyByteBuf, ClientConfigPacketReceiver<CustomPacketPayload>> CONFIG_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
-    public static final ChannelRegistry<FriendlyByteBuf, ServerConfigPacketReceiver<CustomPacketPayload>> CONFIG_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<FriendlyByteBuf, ClientConfigContext> CONFIG_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<FriendlyByteBuf, ServerConfigContext> CONFIG_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
-    public static final ChannelRegistry<RegistryFriendlyByteBuf, ClientPlayPacketReceiver<CustomPacketPayload>> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
-    public static final ChannelRegistry<RegistryFriendlyByteBuf, ServerPlayPacketReceiver<CustomPacketPayload>> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<RegistryFriendlyByteBuf, ClientPlayContext> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
+    public static final ChannelRegistry<RegistryFriendlyByteBuf, ServerPlayContext> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
     private final Set<ResourceLocation> reservedChannels;
 
     private final Map<ResourceLocation, StreamCodec<?, ?>> codecs = new HashMap<>();
-    private final Map<ResourceLocation, R> receivers = new HashMap<>();
-    private final Set<AbstractPacketHandler<R, B>> handlers = new HashSet<>();
+    private final Map<ResourceLocation, PacketReceiver<C, CustomPacketPayload>> receivers = new HashMap<>();
+    private final Set<AbstractPacketHandler<C, B>> handlers = new HashSet<>();
 
     private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
 
@@ -63,7 +64,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCod
         }
     }
 
-    public void registerReceiver(ResourceLocation id, R receiver) {
+    public void registerReceiver(ResourceLocation id, PacketReceiver<C, CustomPacketPayload> receiver) {
         Lock lock = locks.writeLock();
         lock.lock();
 
@@ -73,7 +74,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCod
             }
 
             receivers.put(id, receiver);
-            for (AbstractPacketHandler<R, B> handler : handlers) {
+            for (AbstractPacketHandler<C, B> handler : handlers) {
                 handler.onRegister(id);
             }
         } finally {
@@ -92,7 +93,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCod
         }
     }
 
-    public R get(ResourceLocation id) {
+    public PacketReceiver<C, CustomPacketPayload> get(ResourceLocation id) {
         Lock lock = locks.readLock();
         lock.lock();
 
@@ -127,7 +128,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCod
         }
     }
 
-    public void addHandler(AbstractPacketHandler<R, B> handler) {
+    public void addHandler(AbstractPacketHandler<C, B> handler) {
         Lock lock = locks.writeLock();
         lock.lock();
 
@@ -138,7 +139,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, R> implements ChannelCod
         }
     }
 
-    public void removeHandler(AbstractPacketHandler<R, B> handler) {
+    public void removeHandler(AbstractPacketHandler<C, B> handler) {
         Lock lock = locks.writeLock();
         lock.lock();
 
