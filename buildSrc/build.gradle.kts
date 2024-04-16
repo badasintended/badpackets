@@ -9,6 +9,5 @@ repositories {
 }
 
 dependencies {
-    implementation("com.modrinth.minotaur:Minotaur:2.8.7")
-    implementation("net.darkhax.curseforgegradle:CurseForgeGradle:1.1.18")
+    implementation("me.modmuss50:mod-publish-plugin:0.5.1")
 }
