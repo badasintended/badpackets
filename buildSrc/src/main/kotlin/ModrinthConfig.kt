@@ -1,24 +1,27 @@
-import com.modrinth.minotaur.ModrinthExtension
+import me.modmuss50.mpp.ModPublishExtension
+import me.modmuss50.mpp.ReleaseType
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 
 fun <T : Jar> UploadConfig.modrinth(task: T) = project.run {
-    apply(plugin = "com.modrinth.minotaur")
+    apply(plugin = "me.modmuss50.mod-publish-plugin")
 
-    env["MODRINTH_TOKEN"]?.let { MODRINTH_TOKEN ->
-        configure<ModrinthExtension> {
-            token.set(MODRINTH_TOKEN)
-            projectId.set(rootProp["mr.projectId"])
+    configure<ModPublishExtension> {
+        modrinth {
+            accessToken = env["MODRINTH_TOKEN"]
+            dryRun = env["MODRINTH_TOKEN"] == null
 
-            versionNumber.set("${project.name}-${project.version}")
-            versionType.set(prop["mr.releaseType"])
-            changelog.set("https://github.com/badasintended/badpackets/releases/tag/${project.version}")
+            projectId = rootProp["mr.projectId"]
+            file = task.archiveFile
+            displayName = "${project.version}"
+            version = "${project.name}-${project.version}"
+            type = ReleaseType.of(prop["mr.releaseType"])
+            changelog = "https://github.com/badasintended/badpackets/releases/tag/${project.version}"
 
-            uploadFile.set(task)
-
-            loaders.addAll(prop["mr.loader"].split(", "))
-            gameVersions.addAll(prop["mr.gameVersion"].split(", "))
+            modLoaders.addAll(prop["mr.loader"].split(", "))
+            minecraftVersions.addAll(prop["mr.gameVersion"].split(", "))
         }
     }
 }
