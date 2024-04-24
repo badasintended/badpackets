@@ -2,7 +2,7 @@ import net.neoforged.gradle.dsl.common.runs.run.Run
 
 plugins {
     idea
-    id("net.neoforged.gradle.userdev") version "7.0.+"
+    id("net.neoforged.gradle.userdev") version "7.0.107"
 }
 
 setupPlatform()
@@ -24,7 +24,7 @@ runs {
 tasks.processResources {
     inputs.property("version", project.version)
 
-    filesMatching("META-INF/mods.toml") {
+    filesMatching("META-INF/neoforge.mods.toml") {
         expand("version" to project.version)
     }
 }

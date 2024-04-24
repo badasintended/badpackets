@@ -1,6 +1,6 @@
 package lol.bai.badpackets.impl.mixin;
 
-import java.util.List;
+import java.util.function.Function;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -31,58 +31,13 @@ public abstract class MixinServerboundCustomPayloadPacket {
         }
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
-    private static StreamCodec<?, ?> badpackets_attachChannelCodecs(CustomPacketPayload.FallbackProvider<?> fallbackProvider, List<?> list, Operation<StreamCodec<?, ?>> original) {
-        var codec = original.call(fallbackProvider, list);
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "net/minecraft/network/codec/StreamCodec.map(Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private static StreamCodec<?, ?> badpackets_attachChannelCodecs(StreamCodec<?, ?> codec, Function<?, ?> to, Function<?, ?> from, Operation<StreamCodec<?, ?>> map) {
         ChannelCodecFinder.attach(codec, (id, buf) -> {
             var registry = buf instanceof RegistryFriendlyByteBuf ? ChannelRegistry.PLAY_C2S : ChannelRegistry.CONFIG_C2S;
             return registry.getCodec(id, buf);
         });
-        return codec;
+        return map.call(codec, to, from);
     }
-
-//    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload.codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;"))
-//    private static CustomPacketPayload.FallbackProvider<FriendlyByteBuf> badpackets_getCodec(CustomPacketPayload.FallbackProvider<FriendlyByteBuf> original) {
-//        return id -> {
-//            var playCodec = (StreamCodec<RegistryFriendlyByteBuf, CustomPacketPayload>) ChannelRegistry.PLAY_C2S.getCodec(id);
-//            var configCodec = (StreamCodec<FriendlyByteBuf, CustomPacketPayload>) ChannelRegistry.CONFIG_C2S.getCodec(id);
-//            var discardedCodec = (StreamCodec<FriendlyByteBuf, CustomPacketPayload>) original.create(id);
-//
-//            if (playCodec != null || configCodec != null) {
-//                return new StreamCodec<>() {
-//                    @Override
-//                    public CustomPacketPayload decode(FriendlyByteBuf buf) {
-//                        if (buf instanceof RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-//                            if (playCodec != null) return playCodec.decode(registryFriendlyByteBuf);
-//                        } else {
-//                            if (configCodec != null) return configCodec.decode(buf);
-//                        }
-//
-//                        return discardedCodec.decode(buf);
-//                    }
-//
-//                    @Override
-//                    public void encode(FriendlyByteBuf buf, CustomPacketPayload payload) {
-//                        if (buf instanceof RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-//                            if (playCodec != null) {
-//                                playCodec.encode(registryFriendlyByteBuf, payload);
-//                                return;
-//                            }
-//                        } else {
-//                            if (configCodec != null) {
-//                                configCodec.encode(buf, payload);
-//                                return;
-//                            }
-//                        }
-//
-//                        discardedCodec.encode(buf, payload);
-//                    }
-//                };
-//            }
-//
-//            return discardedCodec;
-//        };
-//    }
-
 
 }

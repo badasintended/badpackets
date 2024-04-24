@@ -27,6 +27,14 @@ allprojects {
         options.encoding = StandardCharsets.UTF_8.name()
         options.release.set(21)
     }
+
+    task("listPluginVersions") {
+        doLast {
+            project.plugins.forEach {
+                println("$it -> ${it.javaClass.protectionDomain.codeSource.location.toURI().toString().lowercase()}")
+            }
+        }
+    }
 }
 
 subprojects {
