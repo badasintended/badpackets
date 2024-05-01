@@ -16,7 +16,7 @@ public class ForgeBadPacketTest {
 
     @SubscribeEvent
     static void setup(FMLCommonSetupEvent event) {
-        BadPacketTest.server();
+        BadPacketTest.common();
     }
 
 }

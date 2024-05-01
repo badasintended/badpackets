@@ -29,10 +29,6 @@ tasks.processResources {
     }
 }
 
-tasks.named<JavaCompile>("compileTestmodJava") {
-    source(rootProject.sourceSets["testmod"].allSource)
-}
-
 afterEvaluate {
     val jar = tasks.jar.get()
     val sourcesJar = tasks.sourcesJar.get()

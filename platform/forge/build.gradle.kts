@@ -1,21 +1,34 @@
 import net.minecraftforge.gradle.common.util.RunConfig
 
 plugins {
-    id("net.minecraftforge.gradle") version "[6.0, 6.2)"
-    id("org.spongepowered.mixin") version "0.7.+"
+    id("net.minecraftforge.gradle") version "6.0.24"
+    id("org.spongepowered.mixin") version "0.7.38"
 }
 
 setupPlatform()
 
 repositories {
     maven("https://maven.minecraftforge.net")
+    maven("https://maven.fabricmc.net/")
+    mavenCentral()
 }
+
+jarJar.enable()
 
 dependencies {
     minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")
 
     implementation("org.jetbrains:annotations:19.0.0")
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    annotationProcessor("net.fabricmc:sponge-mixin:0.13.4+mixin.0.8.5")
+
+    compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
+    annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.ranged(this, "[0.3.5,)")
+    }
+
+    // https://github.com/MinecraftForge/MinecraftForge/blob/7b782e5b05d0059836b39fa072d49f63679d1782/mdk/build.gradle#L143C5-L143C92
+    implementation("net.sf.jopt-simple:jopt-simple:5.0.4") { version { strictly("5.0.4") } }
 }
 
 minecraft {
@@ -29,12 +42,10 @@ minecraft {
             mods {
                 create("badpackets") {
                     source(sourceSets["main"])
-                    source(rootProject.sourceSets["main"])
                 }
 
-                create("badpackets_test") {
+                create("badpackets_testmod") {
                     source(sourceSets["testmod"])
-                    source(rootProject.sourceSets["testmod"])
                 }
             }
         }

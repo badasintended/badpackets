@@ -2,8 +2,6 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
@@ -25,7 +23,7 @@ fun Project.setupPlatform() {
         testmod.apply {
             val root = rootSourceSets["testmod"]
             compileClasspath += main.compileClasspath + main.output + root.output
-            runtimeClasspath += main.runtimeClasspath + main.output + root.output
+            runtimeClasspath += main.runtimeClasspath + main.output
         }
     }
 
@@ -35,6 +33,10 @@ fun Project.setupPlatform() {
 
     tasks.named<JavaCompile>("compileJava") {
         source(rootSourceSets["main"].allJava)
+    }
+
+    tasks.named<JavaCompile>("compileTestmodJava") {
+        source(rootSourceSets["testmod"].allJava)
     }
 
     tasks.named<Jar>("sourcesJar") {
