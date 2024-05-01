@@ -19,10 +19,8 @@ dependencies {
     minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")
 
     implementation("org.jetbrains:annotations:19.0.0")
-    annotationProcessor("net.fabricmc:sponge-mixin:0.13.4+mixin.0.8.5")
 
     compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
-    annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
         jarJar.ranged(this, "[0.3.5,)")
     }
@@ -33,6 +31,7 @@ dependencies {
 
 minecraft {
     mappings("official", rootProp["minecraft"])
+    reobf = false
 
     runs {
         val runConfig = Action<RunConfig> {
@@ -68,17 +67,22 @@ tasks.processResources {
 }
 
 tasks.jar {
-    finalizedBy("reobfJar")
+    archiveClassifier = "dev"
+    finalizedBy("jarJar")
+}
+
+tasks.jarJar {
+    archiveClassifier = ""
 }
 
 afterEvaluate {
-    val jar = tasks.jar.get()
+    val jarJar = tasks.jarJar.get()
     val sourcesJar = tasks.sourcesJar.get()
 
     upload {
-        curseforge(jar)
-        modrinth(jar)
-        maven(jar, sourcesJar)
+        curseforge(jarJar)
+        modrinth(jarJar)
+        maven(jarJar, sourcesJar)
     }
 }
 
