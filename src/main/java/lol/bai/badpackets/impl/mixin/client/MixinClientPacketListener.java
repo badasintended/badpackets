@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundStartConfigurationPacket;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +26,7 @@ public abstract class MixinClientPacketListener extends MixinClientCommonPacketL
     }
 
     @Override
-    protected void badpackets_removeClientPacketHandler(Component reason) {
+    protected void badpackets_removeClientPacketHandler(DisconnectionDetails details) {
         badpacket_packetHandler.remove();
     }
 

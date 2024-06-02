@@ -62,7 +62,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
                     int pathSize = buf.readVarInt();
                     for (int j = 0; j < pathSize; j++) {
                         String path = buf.readUtf();
-                        sendableChannels.add(new ResourceLocation(namespace, path));
+                        sendableChannels.add(ResourceLocation.fromNamespaceAndPath(namespace, path));
                     }
                 }
 

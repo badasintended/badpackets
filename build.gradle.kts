@@ -14,6 +14,16 @@ allprojects {
 
     version = rootProject.version
 
+    repositories {
+        mavenCentral {
+            content {
+                excludeGroupByRegex("org.lwjgl")
+            }
+        }
+
+        maven("https://libraries.minecraft.net")
+    }
+
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 

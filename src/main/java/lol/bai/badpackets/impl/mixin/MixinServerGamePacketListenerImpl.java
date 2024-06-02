@@ -2,7 +2,7 @@ package lol.bai.badpackets.impl.mixin;
 
 import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerboundConfigurationAcknowledgedPacket;
 import net.minecraft.server.MinecraftServer;
@@ -27,7 +27,7 @@ public class MixinServerGamePacketListenerImpl extends MixinServerCommonPacketLi
     }
 
     @Inject(method = "onDisconnect", at = @At("HEAD"))
-    private void badpackets_removeServerPacketHandler(Component reason, CallbackInfo ci) {
+    private void badpackets_removeServerPacketHandler(DisconnectionDetails details, CallbackInfo ci) {
         badpacket_packetHandler.remove();
     }
 

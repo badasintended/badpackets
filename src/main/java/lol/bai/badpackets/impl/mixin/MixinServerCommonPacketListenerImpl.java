@@ -1,6 +1,6 @@
 package lol.bai.badpackets.impl.mixin;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.protocol.common.ServerboundPongPacket;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +18,7 @@ public class MixinServerCommonPacketListenerImpl {
     }
 
     @Inject(method = "onDisconnect", at = @At("HEAD"))
-    private void badpackets_removePacketHandler(Component reason, CallbackInfo ci) {
+    private void badpackets_removePacketHandler(DisconnectionDetails details, CallbackInfo ci) {
         badpackets_removePacketHandler();
     }
 

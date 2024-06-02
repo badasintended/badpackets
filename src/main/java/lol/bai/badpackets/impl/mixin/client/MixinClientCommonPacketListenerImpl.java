@@ -1,7 +1,7 @@
 package lol.bai.badpackets.impl.mixin.client;
 
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinClientCommonPacketListenerImpl {
 
     @Inject(method = "onDisconnect", at = @At("HEAD"))
-    private void badpackets_removeClientPacketHandler(Component reason, CallbackInfo ci) {
-        badpackets_removeClientPacketHandler(reason);
+    private void badpackets_removeClientPacketHandler(DisconnectionDetails details, CallbackInfo ci) {
+        badpackets_removeClientPacketHandler(details);
     }
 
     @Inject(method = "handlePing", at = @At("HEAD"), cancellable = true)
@@ -23,7 +23,7 @@ public abstract class MixinClientCommonPacketListenerImpl {
     }
 
     @Unique
-    protected void badpackets_removeClientPacketHandler(Component reason) {
+    protected void badpackets_removeClientPacketHandler(DisconnectionDetails details) {
     }
 
     @Unique
