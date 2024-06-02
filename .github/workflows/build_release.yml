@@ -21,14 +21,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           CURSEFORGE_API: ${{ secrets.CURSEFORGE_API }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-      - uses: sylwit/install-b2-cli-action@ae80099fa373ec5aef6fa509aa3012fcdd936b6d
-        env:
-          B2_APPLICATION_KEY_ID: ${{ secrets.B2_APPLICATION_KEY_ID }}
-          B2_APPLICATION_KEY: ${{ secrets.B2_APPLICATION_KEY }}
-      - run: |
-          b2 sync --replaceNewer .b2 b2://maven-bai-lol
-          b2 clear-account
-      - uses: actions/upload-artifact@v3
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      - uses: actions/upload-artifact@v4
         with:
           name: badpackets-${{ steps.vars.outputs.git_hash }}
           path: "./platform/*/build/libs/**.jar"
