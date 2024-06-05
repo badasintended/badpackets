@@ -69,6 +69,10 @@ tasks.processResources {
 tasks.jar {
     archiveClassifier = "dev"
     finalizedBy("jarJar")
+
+    manifest.attributes(mapOf(
+        "MixinConfigs" to "badpackets.mixins.json"
+    ))
 }
 
 tasks.jarJar {
