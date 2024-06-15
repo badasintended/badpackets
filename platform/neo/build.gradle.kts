@@ -1,8 +1,6 @@
-import net.neoforged.gradle.dsl.common.runs.run.Run
-
 plugins {
     idea
-    id("net.neoforged.gradle.userdev") version "7.0.107"
+    id("net.neoforged.gradle.userdev") version "7.0.142"
 }
 
 setupPlatform()
@@ -12,13 +10,10 @@ dependencies {
 }
 
 runs {
-    val runConfig = Action<Run> {
+    configureEach {
         modSource(sourceSets["main"])
         modSource(sourceSets["testmod"])
     }
-
-    create("client", runConfig)
-    create("server", runConfig)
 }
 
 tasks.processResources {

@@ -1,7 +1,7 @@
 import net.minecraftforge.gradle.common.util.RunConfig
 
 plugins {
-    id("net.minecraftforge.gradle") version "6.0.24"
+    id("net.minecraftforge.gradle") version "6.0.25"
     id("org.spongepowered.mixin") version "0.7.38"
 }
 
