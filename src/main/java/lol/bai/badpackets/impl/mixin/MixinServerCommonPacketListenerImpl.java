@@ -1,6 +1,5 @@
 package lol.bai.badpackets.impl.mixin;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundPongPacket;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
@@ -23,18 +22,9 @@ public class MixinServerCommonPacketListenerImpl {
         badpackets_onPong(packet.getId());
     }
 
-    @Inject(method = "onDisconnect", at = @At("HEAD"))
-    private void badpackets_removePacketHandler(Component reason, CallbackInfo ci) {
-        badpackets_removePacketHandler();
-    }
-
     @Unique
     protected boolean badpackets_handleCustomPayload(ServerboundCustomPayloadPacket packet) {
         return false;
-    }
-
-    @Unique
-    protected void badpackets_removePacketHandler() {
     }
 
     @Unique

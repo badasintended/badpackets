@@ -26,7 +26,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     }
 
     public static ServerPlayPacketHandler get(ServerPlayer player) {
-        return ((ServerPlayPacketHandler.Holder) player.connection).badpackets_getHandler();
+        return ((PacketHandlerHolder<ServerPlayPacketHandler>) player.connection).badpackets_handler();
     }
 
     @Override
@@ -44,12 +44,6 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     @Override
     protected void receiveUnsafe(ServerPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(server, handler.getPlayer(), handler, payload, this);
-    }
-
-    public interface Holder {
-
-        ServerPlayPacketHandler badpackets_getHandler();
-
     }
 
 }

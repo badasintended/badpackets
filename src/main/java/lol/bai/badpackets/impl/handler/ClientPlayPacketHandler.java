@@ -30,7 +30,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
             throw new IllegalStateException("Cannot get c2s sender when not in play stage!");
         }
 
-        return ((ClientPlayPacketHandler.Holder) listener).badpackets_getHandler();
+        return ((PacketHandlerHolder<ClientPlayPacketHandler>) listener).badpackets_handler();
     }
 
     @Override
@@ -49,12 +49,6 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayPac
     @Override
     protected void receiveUnsafe(ClientPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(client, listener, payload, this);
-    }
-
-    public interface Holder {
-
-        ClientPlayPacketHandler badpackets_getHandler();
-
     }
 
 }

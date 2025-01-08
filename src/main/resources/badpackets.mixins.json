@@ -6,6 +6,7 @@
   "refmap"            : "badpackets.refmap.json",
   "mixins"            : [
     "AccessServerboundCustomPayloadPacket",
+    "MixinConnection",
     "MixinPlayerList",
     "MixinServerboundCustomPayloadPacket",
     "MixinServerCommonPacketListenerImpl",
