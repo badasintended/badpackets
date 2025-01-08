@@ -1,8 +1,5 @@
 package lol.bai.badpackets.impl.handler;
 
-import java.util.Set;
-import java.util.function.Consumer;
-
 import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.play.ClientPlayContext;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
@@ -15,6 +12,9 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayContext, RegistryFriendlyByteBuf> implements ClientPlayContext {
 
@@ -34,7 +34,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayCon
             throw new IllegalStateException("Cannot get c2s sender when not in play stage!");
         }
 
-        return ((ClientPlayPacketHandler.Holder) listener).badpackets_getHandler();
+        return ((PacketHandlerHolder<ClientPlayPacketHandler>) listener).badpackets_handler();
     }
 
     @Override
@@ -63,12 +63,6 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayCon
     @Override
     public ClientPacketListener handler() {
         return listener;
-    }
-
-    public interface Holder extends AbstractPacketHandler.Holder {
-
-        ClientPlayPacketHandler badpackets_getHandler();
-
     }
 
 }
