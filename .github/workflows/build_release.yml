@@ -15,7 +15,7 @@ jobs:
           java-version: 17
           distribution: temurin
       - run: chmod +x gradlew
-      - run: ./gradlew build publish curseforge modrinth
+      - run: ./gradlew build publishMods publish
         env:
           MOD_VERSION: ${{ steps.vars.outputs.version }}
           GITHUB_TOKEN: ${{ github.token }}
