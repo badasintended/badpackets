@@ -1,15 +1,5 @@
 package lol.bai.badpackets.impl.handler;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 import io.netty.buffer.Unpooled;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.Constants;
@@ -26,6 +16,16 @@ import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public abstract class AbstractPacketHandler<T> implements PacketSender {
 
@@ -172,12 +172,6 @@ public abstract class AbstractPacketHandler<T> implements PacketSender {
     @Override
     public boolean canSend(ResourceLocation id) {
         return sendableChannels.contains(id);
-    }
-
-    public interface Holder {
-
-        boolean badpackets_receive(CustomPacketPayload payload);
-
     }
 
 }

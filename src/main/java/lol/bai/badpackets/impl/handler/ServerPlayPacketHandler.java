@@ -1,8 +1,5 @@
 package lol.bai.badpackets.impl.handler;
 
-import java.util.Set;
-import java.util.function.Supplier;
-
 import lol.bai.badpackets.api.play.ServerPlayPacketReadyCallback;
 import lol.bai.badpackets.api.play.ServerPlayPacketReceiver;
 import lol.bai.badpackets.impl.platform.PlatformProxy;
@@ -18,6 +15,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPacketReceiver<CustomPacketPayload>> {
 
     private final MinecraftServer server;
@@ -30,7 +30,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     }
 
     public static ServerPlayPacketHandler get(ServerPlayer player) {
-        return ((ServerPlayPacketHandler.Holder) player.connection).badpackets_getHandler();
+        return ((PacketHandlerHolder<ServerPlayPacketHandler>) player.connection).badpackets_handler();
     }
 
     @Override
@@ -48,12 +48,6 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayPac
     @Override
     protected void receiveUnsafe(ServerPlayPacketReceiver<CustomPacketPayload> receiver, CustomPacketPayload payload) {
         receiver.receive(server, handler.getPlayer(), handler, payload, this);
-    }
-
-    public interface Holder extends AbstractPacketHandler.Holder {
-
-        ServerPlayPacketHandler badpackets_getHandler();
-
     }
 
 }

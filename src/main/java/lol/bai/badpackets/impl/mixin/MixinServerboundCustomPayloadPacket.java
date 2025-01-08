@@ -1,9 +1,7 @@
 package lol.bai.badpackets.impl.mixin;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
+import lol.bai.badpackets.impl.handler.PacketHandlerHolder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
@@ -16,6 +14,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Mixin(ServerboundCustomPayloadPacket.class)
 public abstract class MixinServerboundCustomPayloadPacket {
@@ -36,7 +37,7 @@ public abstract class MixinServerboundCustomPayloadPacket {
 
     @Inject(method = "handle(Lnet/minecraft/network/protocol/common/ServerCommonPacketListener;)V", at = @At("HEAD"), cancellable = true)
     private void badpackets_handle(ServerCommonPacketListener listener, CallbackInfo ci) {
-        if (listener instanceof AbstractPacketHandler.Holder holder && holder.badpackets_receive(payload())) {
+        if (listener instanceof PacketHandlerHolder<?> holder && holder.badpackets_handler().receive(payload())) {
             ci.cancel();
         }
     }
