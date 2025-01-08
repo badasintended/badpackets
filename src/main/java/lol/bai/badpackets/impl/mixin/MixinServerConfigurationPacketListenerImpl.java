@@ -1,13 +1,9 @@
 package lol.bai.badpackets.impl.mixin;
 
-import java.util.Queue;
-
 import lol.bai.badpackets.impl.Constants;
-import lol.bai.badpackets.impl.handler.AbstractPacketHandler;
+import lol.bai.badpackets.impl.handler.PacketHandlerHolder;
 import lol.bai.badpackets.impl.handler.ServerConfigPacketHandler;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.configuration.ServerboundFinishConfigurationPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ConfigurationTask;
@@ -23,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Queue;
+
 @Mixin(ServerConfigurationPacketListenerImpl.class)
-public abstract class MixinServerConfigurationPacketListenerImpl extends MixinServerCommonPacketListenerImpl implements ServerConfigPacketHandler.TaskFinisher, AbstractPacketHandler.Holder {
+public abstract class MixinServerConfigurationPacketListenerImpl extends MixinServerCommonPacketListenerImpl implements ServerConfigPacketHandler.TaskFinisher, PacketHandlerHolder<ServerConfigPacketHandler> {
 
     @Shadow
     @Final
@@ -51,11 +49,6 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
         configurationTasks.addAll(ServerConfigPacketHandler.CUSTOM_TASKS.values());
     }
 
-    @Inject(method = "handleConfigurationFinished", at = @At("RETURN"))
-    private void badpackets_removePacketHandler(ServerboundFinishConfigurationPacket packet, CallbackInfo ci) {
-        badpackets_packetHandler.remove();
-    }
-
     @Inject(method = "startNextTask", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/network/ServerConfigurationPacketListenerImpl;currentTask:Lnet/minecraft/server/network/ConfigurationTask;"))
     private void badpackets_attachCustomTaskContext(CallbackInfo ci, ConfigurationTask task) {
         if (task instanceof ServerConfigPacketHandler.CustomTask custom) {
@@ -71,13 +64,8 @@ public abstract class MixinServerConfigurationPacketListenerImpl extends MixinSe
     }
 
     @Override
-    protected void badpackets_removePacketHandler() {
-        badpackets_packetHandler.remove();
-    }
-
-    @Override
-    public boolean badpackets_receive(CustomPacketPayload payload) {
-        return badpackets_packetHandler.receive(payload);
+    public ServerConfigPacketHandler badpackets_handler() {
+        return badpackets_packetHandler;
     }
 
     @Override
