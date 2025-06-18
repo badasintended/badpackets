@@ -1,5 +1,6 @@
 package lol.bai.badpackets.api;
 
+import io.netty.channel.ChannelFutureListener;
 import lol.bai.badpackets.api.play.ClientPlayContext;
 import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.api.play.ServerPlayContext;
@@ -8,7 +9,6 @@ import lol.bai.badpackets.impl.handler.ServerPlayPacketHandler;
 import lol.bai.badpackets.impl.marker.ApiSide;
 import lol.bai.badpackets.impl.payload.UntypedPayload;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -78,7 +78,7 @@ public interface PacketSender {
      *
      * @param callback a callback in which will be called after the packet sent to the target.
      */
-    void send(CustomPacketPayload payload, @Nullable PacketSendListener callback);
+    void send(CustomPacketPayload payload, @Nullable ChannelFutureListener callback);
 
     /**
      * Send a packet to the target.
@@ -92,7 +92,7 @@ public interface PacketSender {
      *
      * @param callback a callback in which will be called after the packet sent to the target.
      */
-    default void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable PacketSendListener callback) {
+    default void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable ChannelFutureListener callback) {
         send(new UntypedPayload(UntypedPayload.type(id), buf), callback);
     }
 

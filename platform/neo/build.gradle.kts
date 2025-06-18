@@ -1,18 +1,30 @@
 plugins {
     idea
-    id("net.neoforged.gradle.userdev") version "7.0.142"
+    id("net.neoforged.moddev") version "2.0.95"
 }
 
 setupPlatform()
 
-dependencies {
-    implementation("net.neoforged:neoforge:${rootProp["neo"]}")
-}
+neoForge {
+    version = rootProp["neo"]
 
-runs {
-    configureEach {
-        modSource(sourceSets["main"])
-        modSource(sourceSets["testmod"])
+    runs {
+        create("server") { server() }
+        create("client") {
+            client()
+            programArguments.addAll("--username", "A")
+        }
+
+        configureEach {
+            gameDirectory = file("run/${namer.determineName(this)}")
+        }
+
+        mods {
+            create("badpackets") {
+                sourceSet(sourceSets["main"])
+                sourceSet(sourceSets["testmod"])
+            }
+        }
     }
 }
 

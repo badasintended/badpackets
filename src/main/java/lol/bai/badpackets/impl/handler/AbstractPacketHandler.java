@@ -1,6 +1,7 @@
 package lol.bai.badpackets.impl.handler;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.PacketSender;
 import lol.bai.badpackets.impl.Constants;
@@ -9,7 +10,6 @@ import lol.bai.badpackets.impl.platform.PlatformProxy;
 import lol.bai.badpackets.impl.registry.ChannelRegistry;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -160,7 +160,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
     protected abstract Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<B> buf);
 
     @Override
-    public void send(CustomPacketPayload payload, @Nullable PacketSendListener callback) {
+    public void send(CustomPacketPayload payload, @Nullable ChannelFutureListener callback) {
         connection.send(packetFactory.apply(payload), callback);
     }
 

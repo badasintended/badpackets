@@ -30,5 +30,5 @@ fun platform(name: String) {
 platform("mojmap")
 
 platform("fabric")
-platform("forge")
+//platform("forge")
 platform("neo")

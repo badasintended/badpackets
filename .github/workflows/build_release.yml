@@ -27,7 +27,7 @@ jobs:
         with:
           name: badpackets-${{ steps.vars.outputs.git_hash }}
           path: "./platform/*/build/libs/**.jar"
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
