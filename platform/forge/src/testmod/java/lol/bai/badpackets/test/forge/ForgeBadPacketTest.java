@@ -2,7 +2,7 @@ package lol.bai.badpackets.test.forge;
 
 import lol.bai.badpackets.impl.Constants;
 import lol.bai.badpackets.test.BadPacketTest;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;

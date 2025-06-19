@@ -1,7 +1,7 @@
 import net.minecraftforge.gradle.common.util.RunConfig
 
 plugins {
-    id("net.minecraftforge.gradle") version "6.0.25"
+    id("net.minecraftforge.gradle") version "6.0.36"
     id("org.spongepowered.mixin") version "0.7.38"
 }
 
@@ -17,6 +17,7 @@ jarJar.enable()
 
 dependencies {
     minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")
+    annotationProcessor("net.minecraftforge:eventbus-validator:7.0-beta.7")
 
     implementation("org.jetbrains:annotations:19.0.0")
 
@@ -37,6 +38,7 @@ minecraft {
         val runConfig = Action<RunConfig> {
             workingDirectory(rootProject.file("run"))
             ideaModule("${rootProject.name}.${project.name}.testmod")
+            property("eventbus.api.strictRuntimeChecks", "true")
 
             mods {
                 create("badpackets") {
