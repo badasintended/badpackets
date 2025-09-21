@@ -1,10 +1,5 @@
 package lol.bai.badpackets.impl.handler;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import lol.bai.badpackets.api.PacketReceiver;
 import lol.bai.badpackets.api.config.ConfigTaskExecutor;
 import lol.bai.badpackets.api.config.ServerConfigContext;
@@ -24,6 +19,11 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+
 public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigContext, FriendlyByteBuf> implements ServerConfigContext {
 
     public static final Map<ResourceLocation, CustomTask> CUSTOM_TASKS = new HashMap<>();
@@ -32,7 +32,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     private final ServerConfigurationPacketListenerImpl listener;
 
     public ServerConfigPacketHandler(MinecraftServer server, ServerConfigurationPacketListenerImpl listener, Connection connection) {
-        super("ServerConfigPacketHandler for " + listener.getOwner().getName(), ChannelRegistry.CONFIG_C2S, ClientboundCustomPayloadPacket::new, server, connection);
+        super("ServerConfigPacketHandler for " + listener.getOwner().name(), ChannelRegistry.CONFIG_C2S, ClientboundCustomPayloadPacket::new, server, connection);
 
         this.server = server;
         this.listener = listener;
