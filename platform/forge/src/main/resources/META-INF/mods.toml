@@ -16,6 +16,6 @@ logoFile = "badpackets.png"
 [[dependencies.badpackets]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21.6,)"
+versionRange = "[1.21.9,)"
 ordering = "NONE"
 side = "BOTH"

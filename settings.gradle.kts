@@ -31,4 +31,4 @@ platform("mojmap")
 
 platform("fabric")
 //platform("forge")
-//platform("neo")
+platform("neo")
