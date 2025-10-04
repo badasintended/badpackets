@@ -18,6 +18,6 @@ config = "badpackets.mixins.json"
 [[dependencies.badpackets]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.6,)"
+versionRange = "[1.21.9,)"
 ordering = "NONE"
 side = "BOTH"
