@@ -6,20 +6,20 @@ import lol.bai.badpackets.api.play.PlayPackets;
 import lol.bai.badpackets.impl.Constants;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BadPacketTest {
 
-    public static final ResourceLocation CONFIG_TASK = Constants.id("test/config/task");
+    public static final Identifier CONFIG_TASK = Constants.id("test/config/task");
 
-    public static final ResourceLocation CONFIG_C2S = Constants.id("test/config/c2s");
-    public static final ResourceLocation CONFIG_S2C = Constants.id("test/config/s2c");
+    public static final Identifier CONFIG_C2S = Constants.id("test/config/c2s");
+    public static final Identifier CONFIG_S2C = Constants.id("test/config/s2c");
 
-    public static final ResourceLocation PLAY_C2S = Constants.id("test/play/c2s");
-    public static final ResourceLocation PLAY_S2C = Constants.id("test/play/s2c");
+    public static final Identifier PLAY_C2S = Constants.id("test/play/c2s");
+    public static final Identifier PLAY_S2C = Constants.id("test/play/s2c");
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BadPacketTest.class);
 

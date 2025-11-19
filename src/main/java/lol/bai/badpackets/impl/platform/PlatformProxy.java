@@ -12,7 +12,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class PlatformProxy {
@@ -26,24 +26,24 @@ public class PlatformProxy {
     @SuppressWarnings("unchecked")
     private static <T extends FriendlyByteBuf> T createBuf(@Nullable RegistryAccess registry, Consumer<T> writer) {
         var buf = (T) (registry != null ? new RegistryFriendlyByteBuf(Unpooled.buffer(), registry) : new FriendlyByteBuf(Unpooled.buffer()));
-        buf.writeResourceLocation(Constants.MC_REGISTER_CHANNEL);
+        buf.writeIdentifier(Constants.MC_REGISTER_CHANNEL);
         writer.accept(buf);
         return buf;
     }
 
-    public Packet<?> createVanillaRegisterConfigC2SPacket(Set<ResourceLocation> channels, Consumer<FriendlyByteBuf> writer) {
+    public Packet<?> createVanillaRegisterConfigC2SPacket(Set<Identifier> channels, Consumer<FriendlyByteBuf> writer) {
         return ServerboundCustomPayloadPacket.STREAM_CODEC.decode(createBuf(null, writer));
     }
 
-    public Packet<?> createVanillaRegisterConfigS2CPacket(Set<ResourceLocation> channels, Consumer<FriendlyByteBuf> writer) {
+    public Packet<?> createVanillaRegisterConfigS2CPacket(Set<Identifier> channels, Consumer<FriendlyByteBuf> writer) {
         return ClientboundCustomPayloadPacket.CONFIG_STREAM_CODEC.decode(createBuf(null, writer));
     }
 
-    public Packet<?> createVanillaRegisterPlayC2SPacket(RegistryAccess registry, Set<ResourceLocation> channels, Consumer<? extends FriendlyByteBuf> writer) {
+    public Packet<?> createVanillaRegisterPlayC2SPacket(RegistryAccess registry, Set<Identifier> channels, Consumer<? extends FriendlyByteBuf> writer) {
         return ServerboundCustomPayloadPacket.STREAM_CODEC.decode(createBuf(registry, writer));
     }
 
-    public Packet<?> createVanillaRegisterPlayS2CPacket(RegistryAccess registry, Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> writer) {
+    public Packet<?> createVanillaRegisterPlayS2CPacket(RegistryAccess registry, Set<Identifier> channels, Consumer<RegistryFriendlyByteBuf> writer) {
         return ClientboundCustomPayloadPacket.GAMEPLAY_STREAM_CODEC.decode(createBuf(registry, writer));
     }
 

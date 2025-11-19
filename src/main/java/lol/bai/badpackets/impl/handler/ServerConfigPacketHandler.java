@@ -13,7 +13,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfigContext, FriendlyByteBuf> implements ServerConfigContext {
 
-    public static final Map<ResourceLocation, CustomTask> CUSTOM_TASKS = new HashMap<>();
+    public static final Map<Identifier, CustomTask> CUSTOM_TASKS = new HashMap<>();
 
     private final MinecraftServer server;
     private final ServerConfigurationPacketListenerImpl listener;
@@ -38,7 +38,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
         this.listener = listener;
     }
 
-    public static void registerTask(ResourceLocation id, ConfigTaskExecutor executor) {
+    public static void registerTask(Identifier id, ConfigTaskExecutor executor) {
         CUSTOM_TASKS.put(id, new CustomTask(id, executor));
     }
 
@@ -47,7 +47,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<FriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<Identifier> channels, Consumer<FriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterConfigS2CPacket(channels, buf);
     }
 
@@ -76,7 +76,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
     }
 
     @Override
-    public void finishTask(ResourceLocation taskId) {
+    public void finishTask(Identifier taskId) {
         ((TaskFinisher) listener).badpackets_finishTask(CUSTOM_TASKS.get(taskId).type);
     }
 
@@ -110,7 +110,7 @@ public class ServerConfigPacketHandler extends AbstractPacketHandler<ServerConfi
 
         private ServerConfigPacketHandler handler;
 
-        public CustomTask(ResourceLocation id, ConfigTaskExecutor executor) {
+        public CustomTask(Identifier id, ConfigTaskExecutor executor) {
             this.type = new Type(id.toString());
             this.executor = executor;
         }

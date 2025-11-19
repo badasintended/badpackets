@@ -10,7 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -34,7 +34,7 @@ public class ServerPlayPacketHandler extends AbstractPacketHandler<ServerPlayCon
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<Identifier> channels, Consumer<RegistryFriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterPlayS2CPacket(server.registryAccess(), channels, buf);
     }
 

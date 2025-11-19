@@ -11,7 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,7 +38,7 @@ public class ClientPlayPacketHandler extends AbstractPacketHandler<ClientPlayCon
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<RegistryFriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<Identifier> channels, Consumer<RegistryFriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterPlayC2SPacket(listener.registryAccess(), channels, buf);
     }
 

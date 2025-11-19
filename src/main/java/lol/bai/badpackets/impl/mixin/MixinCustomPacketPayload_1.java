@@ -3,7 +3,7 @@ package lol.bai.badpackets.impl.mixin;
 import lol.bai.badpackets.impl.registry.ChannelCodecFinder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,7 +25,7 @@ public class MixinCustomPacketPayload_1 implements ChannelCodecFinder.Holder {
         this.badpackets_channelCodecFinder = finder;
     }
 
-    @Inject(method = "writeCap", cancellable = true, at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1.findCodec(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/network/codec/StreamCodec;"))
+    @Inject(method = "writeCap", cancellable = true, at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1.findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
     private void badpackets_encode(FriendlyByteBuf buf, CustomPacketPayload.Type<?> type, CustomPacketPayload payload, CallbackInfo ci) {
         if (badpackets_channelCodecFinder == null) return;
 
@@ -36,8 +36,8 @@ public class MixinCustomPacketPayload_1 implements ChannelCodecFinder.Holder {
         }
     }
 
-    @Inject(method = "decode", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1.findCodec(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/network/codec/StreamCodec;"))
-    private void badpackets_decode(FriendlyByteBuf buf, CallbackInfoReturnable<CustomPacketPayload> cir, ResourceLocation id) {
+    @Inject(method = "decode", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1.findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private void badpackets_decode(FriendlyByteBuf buf, CallbackInfoReturnable<CustomPacketPayload> cir, Identifier id) {
         if (badpackets_channelCodecFinder == null) return;
 
         var codec = badpackets_channelCodecFinder.getCodec(id, buf);

@@ -15,7 +15,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -31,7 +31,7 @@ public final class ConfigPackets {
      *
      * @see ConfigTaskExecutor#runTask
      */
-    public static void registerTask(ResourceLocation id, ConfigTaskExecutor executor) {
+    public static void registerTask(Identifier id, ConfigTaskExecutor executor) {
         ServerConfigPacketHandler.registerTask(id, executor);
     }
 
@@ -40,11 +40,11 @@ public final class ConfigPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(ResourceLocation, PacketReceiver)}
+     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(Identifier, PacketReceiver)}
      *
      * @param id the packet id
      */
-    public static void registerServerChannel(ResourceLocation id) {
+    public static void registerServerChannel(Identifier id) {
         ChannelRegistry.CONFIG_C2S.registerCodec(id, UntypedPayload.codec(id));
     }
 
@@ -65,7 +65,7 @@ public final class ConfigPackets {
     /**
      * Register a client-to-server packet receiver.
      * <p>
-     * The channel needs to be {@linkplain #registerServerChannel(ResourceLocation) registered} first.
+     * The channel needs to be {@linkplain #registerServerChannel(Identifier) registered} first.
      * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain MinecraftServer#execute(Runnable) client thread}.
@@ -73,7 +73,7 @@ public final class ConfigPackets {
      * @param id       the packet id
      * @param receiver the receiver
      */
-    public static void registerServerReceiver(ResourceLocation id, PacketReceiver<ServerConfigContext, FriendlyByteBuf> receiver) {
+    public static void registerServerReceiver(Identifier id, PacketReceiver<ServerConfigContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.CONFIG_C2S.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
@@ -108,11 +108,11 @@ public final class ConfigPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(ResourceLocation, PacketReceiver)}
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(Identifier, PacketReceiver)}
      *
      * @param id the packet id
      */
-    public static void registerClientChannel(ResourceLocation id) {
+    public static void registerClientChannel(Identifier id) {
         ChannelRegistry.CONFIG_S2C.registerCodec(id, UntypedPayload.codec(id));
     }
 
@@ -133,7 +133,7 @@ public final class ConfigPackets {
     /**
      * Register a server-to-client packet receiver.
      * <p>
-     * The channel needs to be {@linkplain #registerClientChannel(ResourceLocation) registered} first.
+     * The channel needs to be {@linkplain #registerClientChannel(Identifier) registered} first.
      * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain Minecraft#execute(Runnable) client thread}.
@@ -142,7 +142,7 @@ public final class ConfigPackets {
      * @param receiver the receiver
      */
     @ApiSide.ClientOnly
-    public static void registerClientReceiver(ResourceLocation id, PacketReceiver<ClientConfigContext, FriendlyByteBuf> receiver) {
+    public static void registerClientReceiver(Identifier id, PacketReceiver<ClientConfigContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.CONFIG_S2C.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 

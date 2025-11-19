@@ -3,7 +3,6 @@
   "minVersion"        : "0.8",
   "package"           : "lol.bai.badpackets.impl.mixin",
   "compatibilityLevel": "JAVA_16",
-  "refmap"            : "badpackets.refmap.json",
   "mixins"            : [
     "MixinClientboundCustomPayloadPacket",
     "MixinConnection",

@@ -1,7 +1,7 @@
 package lol.bai.badpackets.api.config;
 
 import lol.bai.badpackets.api.PacketSender;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.jetbrains.annotations.ApiStatus;
@@ -13,6 +13,6 @@ public interface ServerConfigContext extends PacketSender {
 
     ServerConfigurationPacketListenerImpl handler();
 
-    void finishTask(ResourceLocation taskId);
+    void finishTask(Identifier taskId);
 
 }

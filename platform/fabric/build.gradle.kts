@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.11.8"
+    id("fabric-loom") version "1.13.4"
 }
 
 setupPlatform()
@@ -13,8 +13,6 @@ dependencies {
 }
 
 loom {
-    mixin.defaultRefmapName.set("badpackets.refmap.json")
-
     runs.forEach {
         it.isIdeConfigGenerated = true
     }

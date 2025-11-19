@@ -12,7 +12,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +34,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
     protected final Logger logger;
 
     private final Function<CustomPacketPayload, Packet<?>> packetFactory;
-    private final Set<ResourceLocation> sendableChannels = Collections.synchronizedSet(new HashSet<>());
+    private final Set<Identifier> sendableChannels = Collections.synchronizedSet(new HashSet<>());
 
     private final BlockableEventLoop<?> eventLoop;
     private final Connection connection;
@@ -53,7 +53,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
 
     private void receiveChannelSyncPacket(FriendlyByteBuf buf) {
         switch (buf.readByte()) {
-            case Constants.CHANNEL_SYNC_SINGLE -> sendableChannels.add(buf.readResourceLocation());
+            case Constants.CHANNEL_SYNC_SINGLE -> sendableChannels.add(buf.readIdentifier());
             case Constants.CHANNEL_SYNC_INITIAL -> {
                 int groupSize = buf.readVarInt();
                 for (int i = 0; i < groupSize; i++) {
@@ -62,7 +62,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
                     int pathSize = buf.readVarInt();
                     for (int j = 0; j < pathSize; j++) {
                         String path = buf.readUtf();
-                        sendableChannels.add(ResourceLocation.fromNamespaceAndPath(namespace, path));
+                        sendableChannels.add(Identifier.fromNamespaceAndPath(namespace, path));
                     }
                 }
 
@@ -72,7 +72,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
     }
 
     public boolean receive(CustomPacketPayload payload) {
-        ResourceLocation id = payload.type().id();
+        Identifier id = payload.type().id();
 
         if (id.equals(Constants.CHANNEL_SYNC)) {
             UntypedPayload untyped = (UntypedPayload) payload;
@@ -108,18 +108,18 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
             initialized = true;
             sendVanillaChannelRegisterPacket(Set.of(Constants.CHANNEL_SYNC));
 
-            Set<ResourceLocation> channels = registry.getChannels();
+            Set<Identifier> channels = registry.getChannels();
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeByte(Constants.CHANNEL_SYNC_INITIAL);
 
-            Map<String, List<ResourceLocation>> group = channels.stream().collect(Collectors.groupingBy(ResourceLocation::getNamespace));
+            Map<String, List<Identifier>> group = channels.stream().collect(Collectors.groupingBy(Identifier::getNamespace));
             buf.writeVarInt(group.size());
 
-            for (Map.Entry<String, List<ResourceLocation>> entry : group.entrySet()) {
+            for (Map.Entry<String, List<Identifier>> entry : group.entrySet()) {
                 buf.writeUtf(entry.getKey());
                 buf.writeVarInt(entry.getValue().size());
 
-                for (ResourceLocation value : entry.getValue()) {
+                for (Identifier value : entry.getValue()) {
                     buf.writeUtf(value.getPath());
                 }
             }
@@ -129,10 +129,10 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
         }
     }
 
-    public void onRegister(ResourceLocation id) {
+    public void onRegister(Identifier id) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeByte(Constants.CHANNEL_SYNC_SINGLE);
-        buf.writeResourceLocation(id);
+        buf.writeIdentifier(id);
         send(Constants.CHANNEL_SYNC, buf);
         sendVanillaChannelRegisterPacket(Set.of(id));
     }
@@ -141,11 +141,11 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
         registry.removeHandler(this);
     }
 
-    private void sendVanillaChannelRegisterPacket(Set<ResourceLocation> channels) {
+    private void sendVanillaChannelRegisterPacket(Set<Identifier> channels) {
         if (PlatformProxy.INSTANCE.canSendVanillaRegisterPackets() && !channels.isEmpty()) {
             connection.send(createVanillaRegisterPacket(channels, buf -> {
                 boolean first = true;
-                for (ResourceLocation channel : channels) {
+                for (Identifier channel : channels) {
                     if (first) {
                         first = false;
                     } else {
@@ -157,7 +157,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
         }
     }
 
-    protected abstract Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<B> buf);
+    protected abstract Packet<?> createVanillaRegisterPacket(Set<Identifier> channels, Consumer<B> buf);
 
     @Override
     public void send(CustomPacketPayload payload, @Nullable ChannelFutureListener callback) {
@@ -165,7 +165,7 @@ public abstract class AbstractPacketHandler<C, B extends FriendlyByteBuf> implem
     }
 
     @Override
-    public boolean canSend(ResourceLocation id) {
+    public boolean canSend(Identifier id) {
         return sendableChannels.contains(id);
     }
 

@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfigContext, FriendlyByteBuf> implements ClientConfigContext {
 
@@ -32,7 +32,7 @@ public class ClientConfigPacketHandler extends AbstractPacketHandler<ClientConfi
     }
 
     @Override
-    protected Packet<?> createVanillaRegisterPacket(Set<ResourceLocation> channels, Consumer<FriendlyByteBuf> buf) {
+    protected Packet<?> createVanillaRegisterPacket(Set<Identifier> channels, Consumer<FriendlyByteBuf> buf) {
         return PlatformProxy.INSTANCE.createVanillaRegisterConfigC2SPacket(channels, buf);
     }
 

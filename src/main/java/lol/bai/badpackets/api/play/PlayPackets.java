@@ -12,7 +12,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -25,11 +25,11 @@ public final class PlayPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(ResourceLocation, PacketReceiver)}
+     * Register the receiver on <b>server side</b> with {@link #registerServerReceiver(Identifier, PacketReceiver)}
      *
      * @param id the packet id
      */
-    public static void registerServerChannel(ResourceLocation id) {
+    public static void registerServerChannel(Identifier id) {
         ChannelRegistry.PLAY_C2S.registerCodec(id, UntypedPayload.codec(id));
     }
 
@@ -50,7 +50,7 @@ public final class PlayPackets {
     /**
      * Register a server-to-client packet receiver.
      * <p>
-     * The channel needs to be {@linkplain #registerServerChannel(ResourceLocation) registered} first.
+     * The channel needs to be {@linkplain #registerServerChannel(Identifier) registered} first.
      * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain MinecraftServer#execute(Runnable) server thread}.
@@ -58,7 +58,7 @@ public final class PlayPackets {
      * @param id       the packet id
      * @param receiver the receiver
      */
-    public static void registerServerReceiver(ResourceLocation id, PacketReceiver<ServerPlayContext, FriendlyByteBuf> receiver) {
+    public static void registerServerReceiver(Identifier id, PacketReceiver<ServerPlayContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.PLAY_C2S.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 
@@ -93,11 +93,11 @@ public final class PlayPackets {
      * <p>
      * This method needs to be called on <b>all sides</b>.
      * <p>
-     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(ResourceLocation, PacketReceiver)}
+     * Register the receiver on <b>client side</b> with {@link #registerClientReceiver(Identifier, PacketReceiver)}
      *
      * @param id the packet id
      */
-    public static void registerClientChannel(ResourceLocation id) {
+    public static void registerClientChannel(Identifier id) {
         ChannelRegistry.PLAY_S2C.registerCodec(id, UntypedPayload.codec(id));
     }
 
@@ -118,7 +118,7 @@ public final class PlayPackets {
     /**
      * Register a server-to-client packet receiver.
      * <p>
-     * The channel needs to be {@linkplain #registerClientChannel(ResourceLocation) registered} first.
+     * The channel needs to be {@linkplain #registerClientChannel(Identifier) registered} first.
      * <p>
      * Raw packet receiver is run on Netty event-loop. Read the buffer on it and run
      * the operation on {@linkplain Minecraft#execute(Runnable) client thread}.
@@ -127,7 +127,7 @@ public final class PlayPackets {
      * @param receiver the receiver
      */
     @ApiSide.ClientOnly
-    public static void registerClientReceiver(ResourceLocation id, PacketReceiver<ClientPlayContext, FriendlyByteBuf> receiver) {
+    public static void registerClientReceiver(Identifier id, PacketReceiver<ClientPlayContext, FriendlyByteBuf> receiver) {
         ChannelRegistry.PLAY_S2C.registerReceiver(id, (context, payload) -> receiver.receive(context, ((UntypedPayload) payload).buffer()));
     }
 

@@ -11,7 +11,7 @@ import lol.bai.badpackets.impl.payload.UntypedPayload;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ public interface PacketSender {
      * <p>
      * <b>Only available when on game.</b>
      *
-     * @see PlayPackets#registerServerChannel(ResourceLocation)
+     * @see PlayPackets#registerServerChannel(Identifier)
      * @see PlayPackets#registerServerChannel(CustomPacketPayload.Type, StreamCodec)
      */
     @ApiSide.ClientOnly
@@ -37,7 +37,7 @@ public interface PacketSender {
      *
      * @param player the player that we want to send packets to.
      *
-     * @see PlayPackets#registerClientChannel(ResourceLocation)
+     * @see PlayPackets#registerClientChannel(Identifier)
      * @see PlayPackets#registerClientChannel(CustomPacketPayload.Type, StreamCodec)
      */
     static ServerPlayContext s2c(ServerPlayer player) {
@@ -52,7 +52,7 @@ public interface PacketSender {
      * @see PlayPackets#registerClientReadyCallback(PacketReadyCallback)
      * @see PlayPackets#registerServerReadyCallback(PacketReadyCallback)
      */
-    boolean canSend(ResourceLocation id);
+    boolean canSend(Identifier id);
 
     /**
      * Returns whether the target can receive a packet with the specified id.
@@ -83,7 +83,7 @@ public interface PacketSender {
     /**
      * Send a packet to the target.
      */
-    default void send(ResourceLocation id, FriendlyByteBuf buf) {
+    default void send(Identifier id, FriendlyByteBuf buf) {
         send(id, buf, null);
     }
 
@@ -92,7 +92,7 @@ public interface PacketSender {
      *
      * @param callback a callback in which will be called after the packet sent to the target.
      */
-    default void send(ResourceLocation id, FriendlyByteBuf buf, @Nullable ChannelFutureListener callback) {
+    default void send(Identifier id, FriendlyByteBuf buf, @Nullable ChannelFutureListener callback) {
         send(new UntypedPayload(UntypedPayload.type(id), buf), callback);
     }
 

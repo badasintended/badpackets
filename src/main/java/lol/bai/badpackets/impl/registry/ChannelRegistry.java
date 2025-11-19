@@ -19,12 +19,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCodecFinder {
 
-    private static final Set<ResourceLocation> RESERVED_CHANNELS = Set.of(
+    private static final Set<Identifier> RESERVED_CHANNELS = Set.of(
         Constants.CHANNEL_SYNC,
         Constants.MC_REGISTER_CHANNEL,
         Constants.MC_UNREGISTER_CHANNEL);
@@ -35,21 +35,21 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
     public static final ChannelRegistry<RegistryFriendlyByteBuf, ClientPlayContext> PLAY_S2C = new ChannelRegistry<>(RESERVED_CHANNELS);
     public static final ChannelRegistry<RegistryFriendlyByteBuf, ServerPlayContext> PLAY_C2S = new ChannelRegistry<>(RESERVED_CHANNELS);
 
-    private final Set<ResourceLocation> reservedChannels;
+    private final Set<Identifier> reservedChannels;
 
-    private final Map<ResourceLocation, StreamCodec<?, ?>> codecs = new HashMap<>();
-    private final Map<ResourceLocation, PacketReceiver<C, CustomPacketPayload>> receivers = new HashMap<>();
+    private final Map<Identifier, StreamCodec<?, ?>> codecs = new HashMap<>();
+    private final Map<Identifier, PacketReceiver<C, CustomPacketPayload>> receivers = new HashMap<>();
     private final Set<AbstractPacketHandler<C, B>> handlers = new HashSet<>();
 
     private final ReentrantReadWriteLock locks = new ReentrantReadWriteLock();
 
-    private ChannelRegistry(Set<ResourceLocation> reservedChannels) {
+    private ChannelRegistry(Set<Identifier> reservedChannels) {
         this.reservedChannels = reservedChannels;
 
         codecs.put(Constants.CHANNEL_SYNC, UntypedPayload.codec(Constants.CHANNEL_SYNC));
     }
 
-    public <P extends CustomPacketPayload> void registerCodec(ResourceLocation id, StreamCodec<? super B, P> codec) {
+    public <P extends CustomPacketPayload> void registerCodec(Identifier id, StreamCodec<? super B, P> codec) {
         Lock lock = locks.writeLock();
         lock.lock();
 
@@ -64,7 +64,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
         }
     }
 
-    public void registerReceiver(ResourceLocation id, PacketReceiver<C, CustomPacketPayload> receiver) {
+    public void registerReceiver(Identifier id, PacketReceiver<C, CustomPacketPayload> receiver) {
         Lock lock = locks.writeLock();
         lock.lock();
 
@@ -82,7 +82,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
         }
     }
 
-    public boolean has(ResourceLocation id) {
+    public boolean has(Identifier id) {
         Lock lock = locks.readLock();
         lock.lock();
 
@@ -93,7 +93,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
         }
     }
 
-    public PacketReceiver<C, CustomPacketPayload> get(ResourceLocation id) {
+    public PacketReceiver<C, CustomPacketPayload> get(Identifier id) {
         Lock lock = locks.readLock();
         lock.lock();
 
@@ -106,7 +106,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
 
     @Override
     @SuppressWarnings("unchecked")
-    public @Nullable StreamCodec<FriendlyByteBuf, CustomPacketPayload> getCodec(ResourceLocation id, FriendlyByteBuf buf) {
+    public @Nullable StreamCodec<FriendlyByteBuf, CustomPacketPayload> getCodec(Identifier id, FriendlyByteBuf buf) {
         Lock lock = locks.readLock();
         lock.lock();
 
@@ -117,7 +117,7 @@ public class ChannelRegistry<B extends FriendlyByteBuf, C> implements ChannelCod
         }
     }
 
-    public Set<ResourceLocation> getChannels() {
+    public Set<Identifier> getChannels() {
         Lock lock = locks.readLock();
         lock.lock();
 
