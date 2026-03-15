@@ -2,7 +2,7 @@ import java.nio.charset.StandardCharsets
 
 plugins {
     java
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.15.5"
     id("maven-publish")
 }
 
@@ -25,17 +25,17 @@ allprojects {
     }
 
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
 
         withSourcesJar()
     }
 
     tasks.withType<JavaCompile> {
         options.encoding = StandardCharsets.UTF_8.name()
-        options.release.set(21)
+        options.release.set(25)
     }
 
     task("listPluginVersions") {
@@ -78,20 +78,24 @@ subprojects {
 }
 
 repositories {
-    maven("https://maven.fabricmc.net/")
     mavenCentral()
-}
-
-minecraft {
-    version(rootProp["minecraft"])
+    maven("https://maven2.bai.lol")
 }
 
 dependencies {
+    minecraft("com.mojang:minecraft:${rootProp["minecraft"]}")
+    compileOnly("lol.bai:fabric-loader-environment:0.0.1")
+
     compileOnly("net.fabricmc:sponge-mixin:0.13.2+mixin.0.8.5")
     compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
-    compileOnly("org.ow2.asm:asm:9.6")
+}
 
-    decompiler("org.vineflower:vineflower:1.10.0")
+loom {
+    runs {
+        configureEach {
+            isIdeConfigGenerated = false
+        }
+    }
 }
 
 sourceSets {

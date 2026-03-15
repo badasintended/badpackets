@@ -1,15 +1,16 @@
+import org.gradle.kotlin.dsl.sourcesJar
+
 plugins {
-    id("fabric-loom") version "1.13.4"
+    id("net.fabricmc.fabric-loom")
 }
 
 setupPlatform()
 
 dependencies {
     minecraft("com.mojang:minecraft:${rootProp["minecraft"]}")
-    mappings(loom.officialMojangMappings())
 
-    modImplementation("net.fabricmc:fabric-loader:${rootProp["fabricLoader"]}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
+    implementation("net.fabricmc:fabric-loader:${rootProp["fabricLoader"]}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${rootProp["fabricApi"]}")
 }
 
 loom {
@@ -27,12 +28,12 @@ tasks.processResources {
 }
 
 afterEvaluate {
-    val remapJar = tasks.remapJar.get()
-    val remapSourcesJar = tasks.remapSourcesJar.get()
+    val jar = tasks.jar.get()
+    val sourcesJar = tasks.sourcesJar.get()
 
     upload {
-        curseforge(remapJar)
-        modrinth(remapJar)
-        maven(remapJar, remapSourcesJar)
+        curseforge(jar)
+        modrinth(jar)
+        maven(jar, sourcesJar)
     }
 }
