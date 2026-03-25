@@ -1,6 +1,6 @@
 plugins {
     idea
-    id("net.neoforged.moddev") version "2.0.110"
+    id("net.neoforged.moddev") version "2.0.141"
 }
 
 setupPlatform()
