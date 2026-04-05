@@ -7,13 +7,13 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.language.jvm.tasks.ProcessResources
 
-fun Project.setupPlatform() {
+fun Project.setupPlatform(testSourceSet: String = "testmod") {
     val rootSourceSets = rootProject.extensions.getByType<SourceSetContainer>()
     val sourceSets = extensions.getByType<SourceSetContainer>()
 
     sourceSets.apply {
         val main = getByName("main")
-        val testmod = create("testmod")
+        val testmod = maybeCreate(testSourceSet)
 
         main.apply {
             val root = rootSourceSets["main"]
@@ -35,7 +35,7 @@ fun Project.setupPlatform() {
         source(rootSourceSets["main"].allJava)
     }
 
-    tasks.named<JavaCompile>("compileTestmodJava") {
+    tasks.named<JavaCompile>("compile${testSourceSet.replaceFirstChar { it.uppercaseChar() } }Java") {
         source(rootSourceSets["testmod"].allJava)
     }
 

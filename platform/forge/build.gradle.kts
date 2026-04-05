@@ -1,63 +1,49 @@
-import net.minecraftforge.gradle.common.util.RunConfig
+import net.minecraftforge.gradle.SlimeLauncherOptions
 
 plugins {
-    id("net.minecraftforge.gradle") version "6.0.44"
-    id("org.spongepowered.mixin") version "0.7.38"
+    id("net.minecraftforge.gradle") version "7.0.19"
+    id("net.minecraftforge.jarjar") version "0.2.3"
 }
 
-setupPlatform()
+setupPlatform("test")
 
 repositories {
-    maven("https://maven.minecraftforge.net")
+    minecraft.mavenizer(this)
+    maven(fg.forgeMaven)
+    maven(fg.minecraftLibsMaven)
     maven("https://maven.fabricmc.net/")
     mavenCentral()
 }
 
-jarJar.enable()
+jarJar.register {
+    archiveClassifier = null
+}
 
 dependencies {
-    minecraft("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}")
+    implementation(minecraft.dependency("net.minecraftforge:forge:${rootProp["minecraft"]}-${rootProp["forge"]}"))
     annotationProcessor("net.minecraftforge:eventbus-validator:7.0-beta.7")
 
     implementation("org.jetbrains:annotations:19.0.0")
 
     compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
-        jarJar.ranged(this, "[0.3.5,)")
+    implementation("jarJar"("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.configure(this) {
+            setRange("[0.3.5,)")
+        }
     }
-
-    // https://github.com/MinecraftForge/MinecraftForge/blob/7b782e5b05d0059836b39fa072d49f63679d1782/mdk/build.gradle#L143C5-L143C92
-    implementation("net.sf.jopt-simple:jopt-simple:5.0.4") { version { strictly("5.0.4") } }
 }
 
 minecraft {
     mappings("official", rootProp["minecraft"])
-    reobf = false
 
     runs {
-        val runConfig = Action<RunConfig> {
-            workingDirectory(rootProject.file("run"))
-            ideaModule("${rootProject.name}.${project.name}.testmod")
-            property("eventbus.api.strictRuntimeChecks", "true")
-
-            mods {
-                create("badpackets") {
-                    source(sourceSets["main"])
-                }
-
-                create("badpackets_testmod") {
-                    source(sourceSets["testmod"])
-                }
-            }
+        val runConfig = Action<SlimeLauncherOptions> {
+            workingDir = rootProject.file("run")
+            args("--mixin.config=badpackets.mixins.json")
         }
         create("client", runConfig)
         create("server", runConfig)
     }
-}
-
-mixin {
-    add(sourceSets["main"], "badpackets.refmap.json")
-    config("badpackets.mixins.json")
 }
 
 tasks.processResources {
@@ -72,17 +58,19 @@ tasks.jar {
     archiveClassifier = "dev"
     finalizedBy("jarJar")
 
-    manifest.attributes(mapOf(
-        "MixinConfigs" to "badpackets.mixins.json"
-    ))
+    manifest.attributes(
+        mapOf(
+            "MixinConfigs" to "badpackets.mixins.json"
+        )
+    )
 }
 
-tasks.jarJar {
-    archiveClassifier = ""
+tasks.test {
+    failOnNoDiscoveredTests = false
 }
 
 afterEvaluate {
-    val jarJar = tasks.jarJar.get()
+    val jarJar by tasks.getting(Jar::class)
     val sourcesJar = tasks.sourcesJar.get()
 
     upload {
