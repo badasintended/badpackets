@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.modmuss50:mod-publish-plugin:0.5.1")
+    implementation("me.modmuss50:mod-publish-plugin:2.1.1")
 
     // https://github.com/MinecraftForge/ForgeGradle/issues/919
     // The issue still happens because FART still uses outdated srgutils version

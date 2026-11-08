@@ -11,6 +11,7 @@ displayName = "Bad Packets"
 description = "Allow packet messaging between multiple modding platform."
 authors = "deirn"
 logoFile = "badpackets.png"
+iconFile = "badpackets.png"
 
 [[mixins]]
 config = "badpackets.mixins.json"
