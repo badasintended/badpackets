@@ -30,8 +30,8 @@ public class MixinConnection {
         badpackets_cleanListener();
     }
 
-    @Inject(method = "handleDisconnection", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketListener;onDisconnect(Lnet/minecraft/network/DisconnectionDetails;)V"))
-    private void badpackets_cleanListener(CallbackInfo ci) {
+    @Inject(method = "handleDisconnection(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketListener;onDisconnect(Lnet/minecraft/network/DisconnectionDetails;)V"))
+    private void badpackets_cleanListener(boolean fromChannel, CallbackInfo ci) {
         badpackets_cleanListener();
     }
 
